@@ -6,31 +6,7 @@ from utils import *
 import pymupdf4llm 
 
 
-# Helper: Simple Keyword Extractor for the JOBS DB (to simulate "Market Skills")
-# In a production app, we would run the LLM on every job description to extract structured skills.
-# For this prototype, we scan the description for known Data keywords.
-KNOWN_SKILLS = [
-    "python", "sql", "java", "scala", "go", "kotlin",
-    "aws", "azure", "gcp", "snowflake", "databricks", "bigquery", "redshift",
-    "spark", "pyspark", "hadoop", "hive", "kafka", "flink", "airflow", "dbt", 
-    "docker", "kubernetes", "terraform", "ci/cd", "git",
-    "looker", "tableau", "power bi",
-    "machine learning", "mlops", "langchain", "llm", "rag", "vector database"
-]
-
-def enrich_jobs_with_skills(jobs):
-    """Enriches the raw job descriptions with a list of identified skills."""
-    enriched = []
-    for job in jobs:
-        desc = job['description'].lower()
-        found_skills = [skill for skill in KNOWN_SKILLS if skill in desc]
-        # Also add skills explicitly listed in the description text provided in the JSON if any
-        job['extracted_skills'] = list(set(found_skills)) 
-        enriched.append(job)
-    return enriched
-
-
-st.set_page_config(page_title="Data Engineer Market Fit", layout="wide")
+st.set_page_config(page_title="Technical Fit Analysis", layout="wide")
 
 # Initialize Session State
 if 'page' not in st.session_state:
@@ -42,39 +18,35 @@ if 'profile' not in st.session_state:
 with st.sidebar:
     st.header("⚙️ Configuration")
     api_key = st.text_input("Google API Key", type="password", help="Required for live analysis using Gemini.")
-    use_mock = st.checkbox("Use Mock Data (No API Key)", value=False)
-    
-    st.markdown("---")
-    if st.button("Restart"):
-        st.session_state.page = 'upload'
-        st.session_state.profile = None
-        st.rerun()
 
 # --- PAGE 1: UPLOAD ---
 if st.session_state.page == 'upload':
     st.title("Market Technical Fit Analysis for your Resume", text_alignment="center")
+
     st.space("medium")
     uploaded_file = st.file_uploader("Upload your PDF Resume", type="pdf", width="stretch")
-    
+
+    col1, col2, col3 = st.columns([2, 1, 2])
+    with col2:
+        if st.button("Use Mock Data", type="secondary", icon="🧪", use_container_width=True):
+            st.session_state.usage = 'mock'
+            st.session_state.page = 'dashboard'
+            st.rerun()
+
     if uploaded_file:
         if st.button("Analyze CV"):
             with st.spinner("Extracting Skills & analyzing Market Fit..."):
-                # 1. Parse PDF
-                if use_mock:
-                    cv_text = "Placeholder "  # pymupdf4llm.to_markdown("./resume_example.pdf")
-                    profile_data = STRUCTURED_CV  # extract_professional_structured_data(cv_text, api_key)    
-                else:
-                    if not api_key:
-                        st.error("Please enter a Google API Key or select 'Use Mock Data'.")
-                        st.stop()
+                if not api_key:
+                    st.error("Please enter a Google API Key or select 'Use Mock Data'.")
+                    st.stop()
+                
+                try:
+                    #cv_text = pymupdf4llm.to_markdown(uploaded_file)  
+                    profile_data = STRUCTURED_CV  # extract_professional_structured_data(cv_text, api_key) # TODO
                     
-                    try:
-                        cv_text = pymupdf4llm.to_markdown(uploaded_file)  # Assuming pymupdf4llm accepts file paths
-                        profile_data = STRUCTURED_CV  # extract_professional_structured_data(cv_text, api_key)
-                        
-                    except Exception as e:
-                        st.error(f"Error reading PDF: {e}")
-                        st.stop()
+                except Exception as e:
+                    st.error(f"Error reading PDF: {e}")
+                    st.stop()
 
                 if profile_data:
                     st.session_state.profile = profile_data
@@ -83,30 +55,30 @@ if st.session_state.page == 'upload':
 
 # --- PAGE 2: DASHBOARD ---
 elif st.session_state.page == 'dashboard':
-    profile = st.session_state.profile
+    usage = st.session_state.usage
     
-    # 1. PREPARE DATA
-    # Normalize Applicant Skills
+    if usage == 'mock':
+        profile = STRUCTURED_CV  # Using mock data
+        market_data = STRUCTURED_JOBS  
+    else:
+        profile = st.session_state.profile
+        market_data = STRUCTURED_JOBS  # call API # TODO
+
     applicant_skills = set([s['description'].lower() for s in profile['hard_skills']])
-    
-    # Prepare Market Data
-    market_data = enrich_jobs_with_skills(JOBS_DB)
-    
-    # --- CALCULATIONS ---
     
     # A. Match Analysis per Job
     job_matches = []
     for job in market_data:
-        job_skills = set(job['extracted_skills'])
-        match = applicant_skills.intersection(job_skills)
-        missing = job_skills.difference(applicant_skills)
+        job_hard_skills = set([skill['description'].lower() for skill in job['hard_skills']])
+        match = applicant_skills.intersection(job_hard_skills)
+        missing = job_hard_skills.difference(applicant_skills)
         
         job_matches.append({
-            "Job Title": job['title'],
+            "Job Title": job['main_position']['name'],
             "Company": job['company_name'],
             "Match Count": len(match),
-            "Total Job Skills": len(job_skills),
-            "Match %": round(len(match) / len(job_skills) * 100, 1) if len(job_skills) > 0 else 0,
+            "Total Job Skills": len(job_hard_skills),
+            "Match %": round(len(match) / len(job_hard_skills) * 100, 1) if len(job_hard_skills) > 0 else 0,
             "Missing Skills": ", ".join(list(missing))
         })
     df_matches = pd.DataFrame(job_matches).sort_values("Match Count", ascending=False)
@@ -115,7 +87,7 @@ elif st.session_state.page == 'dashboard':
     # Count how many jobs require the skills the applicant HAS
     app_skill_counts = {}
     for skill in applicant_skills:
-        count = sum(1 for job in market_data if skill in job['extracted_skills'])
+        count = sum(1 for job in market_data if skill in job_hard_skills)
         if count > 0:
             app_skill_counts[skill] = count
     df_app_pop = pd.DataFrame(list(app_skill_counts.items()), columns=['Skill', 'Number of Jobs Demands']).sort_values('Number of Jobs Demands', ascending=True)
@@ -125,7 +97,8 @@ elif st.session_state.page == 'dashboard':
     missing_counter = {}
     total_jobs = len(market_data)
     for job in market_data:
-        for skill in job['extracted_skills']:
+        for skill in job_hard_skills:
+            print(f"")
             if skill not in applicant_skills:
                 missing_counter[skill] = missing_counter.get(skill, 0) + 1
     
@@ -166,7 +139,7 @@ elif st.session_state.page == 'dashboard':
             st.warning("No overlaps found with current market data.")
 
     with col2:
-        st.subheader("⚠️ Critical Skill Gaps")
+        st.subheader("⚠️ Skill Gaps")
         st.caption("Skills you are missing that appear most frequently in job listings.")
         if not df_gaps.empty:
             fig2 = px.bar(df_gaps, x='% of Market', y='Skill', orientation='h', text='% of Market', color_discrete_sequence=['#FF5252'])

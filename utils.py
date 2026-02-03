@@ -1,4 +1,4 @@
-from database_mock import JOBS_DB, STRUCTURED_CV
+from database_mock import JOBS_DB, STRUCTURED_CV, STRUCTURED_JOBS
 
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
