@@ -220,3 +220,59 @@ JOBS_DB = [
       "country": "United States"
     }
   ]
+
+
+STRUCTURED_CV = {
+    'positions': [
+         {'name': 'Data Engineer II', 'field': 'Data Engineering', 'time_experience': 24.0}, 
+         {'name': 'Data Governance Analyst II', 'field': 'Data Governance', 'time_experience': 6.0}
+         ], 
+    'main_position': {'name': 'Data Engineer II', 'field': 'Data Engineering', 'time_experience': 30.0},
+    'main_position_name_variations': ['Data Engineer II'], 
+    'hard_skills': [
+        {'description': 'GCP services (BigQuery, Composer, Cloud Storage, Cloud Run, Pub/Sub, Dataform, Dataflow, Dataplex, Datastream)', 'time_experience': 24.0}, 
+        {'description': 'AWS services (S3, Glue, Athena, DynamoDB)', 'time_experience': 17.0}, {'description': 'Azure services', 'time_experience': 17.0}, 
+        {'description': 'Python', 'time_experience': 30.0}, 
+        {'description': 'SQL', 'time_experience': 30.0}, 
+        {'description': 'Apache Beam', 'time_experience': 24.0}, 
+        {'description': 'IaC tools (GitHub, Docker)', 'time_experience': 24.0}, 
+        {'description': 'CI/CD automations (GitHub Actions)', 'time_experience': 24.0}, 
+        {'description': 'ETL processes', 'time_experience': 30.0}, 
+        {'description': 'ELT processes', 'time_experience': 17.0}, 
+        {'description': 'Data Mesh architecture', 'time_experience': 24.0}, 
+        {'description': 'Medallion Model layers', 'time_experience': 24.0}, 
+        {'description': 'Data Lakehouse Architecture', 'time_experience': 17.0}, 
+        {'description': 'Data Warehouse Management (GCP BigQuery)', 'time_experience': 12.0}, 
+        {'description': 'Data Modeling (star/snowflake schemas, Data Entity Relationship models)', 'time_experience': 12.0}, 
+        {'description': 'Observability Solutions (Data Lineage, Apache Airflow)', 'time_experience': 24.0}, 
+        {'description': 'Shell scripting', 'time_experience': 24.0}, 
+        {'description': 'Bash files', 'time_experience': 24.0}, 
+        {'description': 'Data Governance policies', 'time_experience': 6.0}, 
+        {'description': 'Data Quality Assurance', 'time_experience': 6.0}, 
+        {'description': 'Data Profilling', 'time_experience': 6.0}, 
+        {'description': 'Oracle', 'time_experience': None}, 
+        {'description': 'PostgreSQL', 'time_experience': None}, 
+        {'description': 'Firestore', 'time_experience': None}, 
+        {'description': 'SFTP servers', 'time_experience': None}, 
+        {'description': 'APIs', 'time_experience': None}, 
+        {'description': 'Salesforce', 'time_experience': None}, 
+        {'description': 'Uber', 'time_experience': None}, 
+        {'description': 'Pandas', 'time_experience': None}, 
+        {'description': 'Numpy', 'time_experience': None}, 
+        {'description': 'Object Oriented Programming', 'time_experience': None}, 
+        {'description': 'Infrastructure as Code', 'time_experience': 17.0}, 
+        {'description': 'Codepipeline', 'time_experience': None}, 
+        {'description': 'EFS', 'time_experience': None}, 
+        {'description': 'Lambda function', 'time_experience': None}, 
+        {'description': 'ECR', 'time_experience': None}, 
+        {'description': 'ECS', 'time_experience': None}, 
+        {'description': 'Docker', 'time_experience': None}, 
+        {'description': 'Git', 'time_experience': None}, 
+        {'description': 'Jira', 'time_experience': None}, 
+        {'description': 'Confluence', 'time_experience': None}, 
+        {'description': 'ServiceNow', 'time_experience': None}, 
+        {'description': 'Power BI', 'time_experience': None}, 
+        {'description': 'Looker Studio', 'time_experience': None}], 
+    'soft_skills': ['Communication', 'Collaboration', 'Problem-solving', 'Agile methodology', 'Stakeholder management', 'Mentoring'], 
+    'creation_timestamp': '2026-02-03 01:49:40'
+}

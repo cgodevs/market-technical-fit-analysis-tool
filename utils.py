@@ -1,4 +1,4 @@
-from database_mock import JOBS_DB
+from database_mock import JOBS_DB, STRUCTURED_CV
 
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -18,7 +18,7 @@ class Position(BaseModel):
 
 class ProfessionalProfile(BaseModel):
     positions: List[Position] = Field(description="Maximum of 3 names for matching positions identified in the profile description")
-    main_position: List[Position] = Field(description="Main position goal identified for profile description")
+    main_position: Position = Field(description="Main position goal identified for profile description")
     main_position_name_variations: list = Field(description="Main position name variations. Example: Senior Accountant, Accountant III, Accountant Specialist, Experienced Accountant")
     hard_skills: List[HardSkill]
     soft_skills: List[str] = Field(description="Description of the soft skill")

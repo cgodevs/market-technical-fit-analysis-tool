@@ -30,23 +30,6 @@ def enrich_jobs_with_skills(jobs):
     return enriched
 
 
-def mock_extract_data():
-    """Fallback mock data if no API key is provided."""
-    return {
-        "positions": [{"name": "Data Engineer", "field": "Data", "time_experience": 24.0}],
-        "main_position": [{"name": "Data Engineer", "field": "Technology", "time_experience": 36.0}],
-        "main_position_name_variations": ["Big Data Engineer"],
-        "hard_skills": [
-            {"description": "python", "time_experience": 48.0},
-            {"description": "sql", "time_experience": 48.0},
-            {"description": "aws", "time_experience": 24.0},
-            {"description": "spark", "time_experience": 12.0},
-            {"description": "airflow", "time_experience": 12.0},
-        ],
-        "soft_skills": ["Communication", "Problem Solving"]
-    }
-
-
 st.set_page_config(page_title="Data Engineer Market Fit", layout="wide")
 
 # Initialize Session State
@@ -62,43 +45,32 @@ with st.sidebar:
     use_mock = st.checkbox("Use Mock Data (No API Key)", value=False)
     
     st.markdown("---")
-    if st.button("Reset App"):
+    if st.button("Restart"):
         st.session_state.page = 'upload'
         st.session_state.profile = None
         st.rerun()
 
 # --- PAGE 1: UPLOAD ---
 if st.session_state.page == 'upload':
-    st.title("🚀 Data Engineer CV Analysis")
-    st.markdown("### Upload your resume to check your Market Technical Fit")
-    
-    uploaded_file = st.file_uploader("Upload PDF Resume", type="pdf")
+    st.title("Market Technical Fit Analysis for your Resume", text_alignment="center")
+    st.space("medium")
+    uploaded_file = st.file_uploader("Upload your PDF Resume", type="pdf", width="stretch")
     
     if uploaded_file:
         if st.button("Analyze CV"):
             with st.spinner("Extracting Skills & analyzing Market Fit..."):
                 # 1. Parse PDF
                 if use_mock:
-                    cv_text = "Mock Text"
-                    profile_data = mock_extract_data()
+                    cv_text = "Placeholder "  # pymupdf4llm.to_markdown("./resume_example.pdf")
+                    profile_data = STRUCTURED_CV  # extract_professional_structured_data(cv_text, api_key)    
                 else:
                     if not api_key:
                         st.error("Please enter a Google API Key or select 'Use Mock Data'.")
                         st.stop()
                     
                     try:
-                        # Attempt to read PDF
-                        pdf_bytes = uploaded_file.read()
-                        cv_text = pymupdf4llm.to_markdown(uploaded_file) # Assuming file path, but for stream we might need pymupdf directly
-                        # NOTE: pymupdf4llm usually takes a file path. For Streamlit upload, we might need a workaround or save to temp.
-                        # For prototype stability, let's treat it as text extraction:
-                        import fitz # PyMuPDF
-                        doc = fitz.open(stream=pdf_bytes, filetype="pdf")
-                        cv_text = ""
-                        for page in doc:
-                            cv_text += page.get_text()
-                            
-                        profile_data = extract_professional_structured_data(cv_text, api_key)
+                        cv_text = pymupdf4llm.to_markdown(uploaded_file)  # Assuming pymupdf4llm accepts file paths
+                        profile_data = STRUCTURED_CV  # extract_professional_structured_data(cv_text, api_key)
                         
                     except Exception as e:
                         st.error(f"Error reading PDF: {e}")
@@ -119,7 +91,6 @@ elif st.session_state.page == 'dashboard':
     
     # Prepare Market Data
     market_data = enrich_jobs_with_skills(JOBS_DB)
-    df_jobs = pd.DataFrame(market_data)
     
     # --- CALCULATIONS ---
     
@@ -172,7 +143,7 @@ elif st.session_state.page == 'dashboard':
     
     st.button("← Upload New CV", on_click=lambda: st.session_state.update(page='upload'))
     
-    st.title(f"📊 Market Technical Fit: {profile['main_position'][0]['name']}")
+    st.title(f"📊 Market Technical Fit: {profile['main_position']['name']}")
     
     # Top Metrics
     c1, c2, c3 = st.columns(3)
