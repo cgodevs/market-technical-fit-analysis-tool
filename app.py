@@ -1,93 +1,10 @@
-import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-import json
-import re
-from typing import List, Optional
-from pydantic import BaseModel, Field
 
-# --- LIBRARIES FROM YOUR PROMPT ---
-try:
-    from langchain_core.messages import HumanMessage
-    from langchain_core.prompts import ChatPromptTemplate
-    from langchain_google_genai import ChatGoogleGenerativeAI
-    import pymupdf4llm 
-except ImportError:
-    st.error("Please install requirements: pip install streamlit pandas plotly langchain-google-genai pydantic pymupdf4llm")
+from utils import *
+import pymupdf4llm 
 
-# ==========================================
-# 1. DATA & MODELS (Based on your Input)
-# ==========================================
-
-# --- Your Pydantic Models ---
-class HardSkill(BaseModel):
-    description: str = Field(description="Description of the hard skill.")
-    time_experience: Optional[float] = Field(description="Optional time experience in months identified for the hard skill application.")
-
-class Position(BaseModel):
-    name: str = Field(description="Name of the goal position or experienced position")
-    field: str = Field(description="Field of the position")
-    time_experience: Optional[float] = Field(description="Optional time experience in months identified for the held position.")
-
-class ProfessionalProfile(BaseModel):
-    positions: List[Position] = Field(description="Maximum of 3 names for matching positions identified in the profile description")
-    main_position: List[Position] = Field(description="Main position goal identified for profile description")
-    main_position_name_variations: list = Field(description="Main position name variations. Example: Senior Accountant, Accountant III, Accountant Specialist, Experienced Accountant")
-    hard_skills: List[HardSkill]
-    soft_skills: List[str] = Field(description="Description of the soft skill")
-
-# --- Job Database (From your uploaded file) ---
-JOBS_DB = [
-  {
-    "id": 889977, "title": "Data Engineer", "company_name": "NBC Universal", "location": "San Francisco, CA",
-    "description": "We are seeking a Senior Data Engineer... skills: Snowflake, LiveRamp, Databricks, Python, MLOps, SQL, Snowpark, PySpark, Airflow, dbt, Great Expectations, LangChain, Snowflake Cortex."
-  },
-  {
-    "id": 901122, "title": "Principal Data Engineer (FinTech)", "company_name": "Apex Finance Systems", "location": "New York, NY",
-    "description": "Real-time Kafka-based architecture. Flink, Kafka, Snowflake, Python, Java, Scala, AWS, Kinesis, MSK, Lambda."
-  },
-  {
-    "id": 901123, "title": "Junior Data Engineer", "company_name": "RetailFlow Inc.", "location": "Austin, TX",
-    "description": "Maintain dbt projects and BigQuery. SQL, dbt, Airflow, Looker, Python, Git, GCP."
-  },
-  {
-    "id": 901124, "title": "Senior Data Engineer - MLOps", "company_name": "NeuralPath AI", "location": "Remote",
-    "description": "LLM training sets. Vector database, Pinecone, Weaviate, PySpark, Databricks, Spark, Kubernetes, MLflow."
-  },
-  {
-    "id": 901125, "title": "Data Engineer (Contract)", "company_name": "Global Logistics Corp", "location": "Chicago, IL",
-    "description": "Migration to Azure Data Factory and Synapse. MapReduce, Spark, Scala, Azure, Hadoop, Hive."
-  },
-  {
-    "id": 901126, "title": "Lead Data Infrastructure Engineer", "company_name": "CloudScale Systems", "location": "Seattle, WA",
-    "description": "Manage Terraform scripts. Trino, Presto, CI/CD, Go, Python, Terraform, CloudFormation, AWS."
-  },
-  {
-    "id": 901127, "title": "Healthcare Data Engineer", "company_name": "BioHealth Data", "location": "Boston, MA",
-    "description": "HIPAA-compliant data lakes. FHIR, HL7, AWS Glue, Athena, Python, Encryption."
-  },
-  {
-    "id": 901128, "title": "Data Engineer - Analytics Engineering", "company_name": "Mountain Metrics", "location": "Denver, CO",
-    "description": "dbt Cloud, Snowflake, Fivetran, Tableau, Unit Testing."
-  },
-  {
-    "id": 901129, "title": "ETL Developer / Data Engineer", "company_name": "AdReach Agency", "location": "Miami, FL",
-    "description": "Consolidating data. SQL, Python, API, Airbyte, Meltano."
-  },
-  {
-    "id": 901130, "title": "Staff Data Engineer (Data Mesh focus)", "company_name": "Enterprise Scale Co", "location": "Remote",
-    "description": "Decentralize architecture. Data Mesh, Data Fabric, Architecture."
-  },
-  {
-    "id": 901131, "title": "Data Engineer - Game Analytics", "company_name": "Starlight Gaming", "location": "Los Angeles, CA",
-    "description": "Track millions of events. Java, Kotlin, Scala, Google Cloud Dataflow, Apache Beam, BigQuery, Looker."
-  }
-]
-
-# ==========================================
-# 2. LOGIC & EXTRACTION
-# ==========================================
 
 # Helper: Simple Keyword Extractor for the JOBS DB (to simulate "Market Skills")
 # In a production app, we would run the LLM on every job description to extract structured skills.
@@ -112,31 +29,6 @@ def enrich_jobs_with_skills(jobs):
         enriched.append(job)
     return enriched
 
-# --- Your LangChain Logic ---
-def extract_professional_structured_data(text: str, api_key: str) -> dict:
-    """Uses Google GenAI to extract the CV profile."""
-    try:
-        # Initialize Google GenAI
-        llm = ChatGoogleGenerativeAI(
-            model="gemini-2.0-flash", # Using a fast model for the prototype
-            temperature=0,
-            google_api_key=api_key,
-            max_retries=2
-        )
-
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", "Your role is to extract relevant data for building a professional role description object out of either a curriculum vitae text or a description for a job position out of input text"),
-            ("human", "{input}")
-        ])
-
-        structured_llm = llm.with_structured_output(schema=ProfessionalProfile)
-        chain = prompt | structured_llm
-        response = chain.invoke({"input": text})
-        return response.model_dump()
-        
-    except Exception as e:
-        st.error(f"Error during extraction: {str(e)}")
-        return None
 
 def mock_extract_data():
     """Fallback mock data if no API key is provided."""
@@ -154,9 +46,6 @@ def mock_extract_data():
         "soft_skills": ["Communication", "Problem Solving"]
     }
 
-# ==========================================
-# 3. STREAMLIT UI
-# ==========================================
 
 st.set_page_config(page_title="Data Engineer Market Fit", layout="wide")
 
