@@ -1,11 +1,12 @@
-from database_mock import JOBS_DB, STRUCTURED_CV, STRUCTURED_JOBS
-
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
 
 from typing import List, Optional
 from pydantic import BaseModel, Field
 import streamlit as st
+import fitz  # PyMuPDF
+import io
+
 
 class HardSkill(BaseModel):
     description: str = Field(description="Description of the hard skill.")
@@ -48,3 +49,12 @@ def extract_professional_structured_data(text: str, api_key: str) -> dict:
     except Exception as e:
         st.error(f"Error during extraction: {str(e)}")
         return None
+    
+def pdf_first_page_as_image(pdf_file):
+    pdf_bytes = pdf_file.read()
+    pdf_document = fitz.open(stream=pdf_bytes, filetype="pdf")
+    first_page = pdf_document[0]
+    pix = first_page.get_pixmap(matrix=fitz.Matrix(2, 2))
+    img_data = io.BytesIO(pix.tobytes("png"))
+    pdf_file.seek(0)
+    return img_data
