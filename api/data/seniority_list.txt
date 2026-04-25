@@ -1,0 +1,14 @@
+Intern
+Junior
+Mid
+Senior
+Associate
+Specialist
+Manager
+Director
+Head
+President/Vice President
+C-Level
+Partner
+Owner
+Founder
