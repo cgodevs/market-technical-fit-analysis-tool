@@ -1,7 +1,8 @@
 {
   "c_source": "LinkedIn API",
-  "ai_seniority":"",
+  "ai_min_seniority":"",
   "ai_industries": [],
+  "ai_experience_time_months": 0,
   "id": "2119062502",
   "date_posted": "2026-04-22T15:13:10",
   "date_created": "2026-04-17T21:14:07.272335",

@@ -18,6 +18,7 @@ Amusement Parks and Arcades
 Animal Feed Manufacturing
 Animation
 Animation and Post-production
+Animation at Post-production
 Apparel & Fashion
 Apparel Manufacturing
 Appliances, Electrical, and Electronics Manufacturing
@@ -27,6 +28,7 @@ Armed Forces
 Artificial Rubber and Synthetic Fiber Manufacturing
 Artists and Writers
 Arts & Crafts
+Arts and Crafts
 Audio and Video Equipment Manufacturing
 Automation Machinery Manufacturing
 Automotive
@@ -35,6 +37,7 @@ Aviation and Aerospace Component Manufacturing
 Baked Goods Manufacturing
 Banking
 Bars, Taverns, and Nightclubs
+Bed-and-Breakfast, Hostel, Homestay
 Bed-and-Breakfasts, Hostels, Homestays
 Beverage Manufacturing
 Biomass Electric Power Generation
@@ -43,8 +46,8 @@ Biotechnology Research
 Blockchain Services
 Blogs
 Boilers, Tanks, and Shipping Container Manufacturing
-Book and Periodical Publishing
 Book Publishing
+Book and Periodical Publishing
 Breweries
 Broadcast Media Production and Distribution
 Building Construction
@@ -56,14 +59,12 @@ Business Consulting and Services
 Business Content
 Business Intelligence Platforms
 Business Supplies & Equipment
-Cable and Satellite Programming
 Capital Markets
 Caterers
 Chemical Manufacturing
 Chemical Raw Materials Manufacturing
 Child Day Care Services
 Chiropractors
-Circuses and Magic Shows
 Civic and Social Organizations
 Civil Engineering
 Claims Adjusting, Actuarial Services
@@ -72,19 +73,19 @@ Climate Data and Analytics
 Climate Technology Product Manufacturing
 Coal Mining
 Collection Agencies
+Commercial Real Estate
 Commercial and Industrial Equipment Rental
 Commercial and Industrial Machinery Maintenance
 Commercial and Service Industry Machinery Manufacturing
-Commercial Real Estate
 Communications Equipment Manufacturing
 Community Development and Urban Planning
 Community Services
-Computer and Network Security
 Computer Games
 Computer Hardware
 Computer Hardware Manufacturing
 Computer Networking
 Computer Networking Products
+Computer and Network Security
 Computers and Electronics Manufacturing
 Conservation Programs
 Construction
@@ -98,23 +99,23 @@ Cosmetics
 Cosmetology and Barber Schools
 Courts of Law
 Credit Intermediation
+Custom Software Development ng IT System
 Cutlery and Handtool Manufacturing
 Dairy
 Dairy Product Manufacturing
 Dance Companies
 Data Infrastructure and Analytics
 Data Security Software Products
-Death Care Services
 Defense & Space
 Defense and Space Manufacturing
 Dentists
-Design
 Design Services
 Desktop Computing Software Products
 Digital Accessibility Services
 Distilleries
-E-learning
+E-Learning
 E-Learning Providers
+E-learning
 Economic Programs
 Education
 Education Administration Programs
@@ -126,10 +127,8 @@ Electrical Equipment Manufacturing
 Electronic and Precision Equipment Maintenance
 Embedded Software Products
 Emergency and Relief Services
-Energy Technology
 Engineering Services
 Engines and Power Transmission Equipment Manufacturing
-Entertainment
 Entertainment Providers
 Environmental Quality Programs
 Environmental Services
@@ -153,17 +152,14 @@ Food & Beverages
 Food and Beverage Manufacturing
 Food and Beverage Retail
 Food and Beverage Services
-Food Production
-Footwear and Leather Goods Repair
 Footwear Manufacturing
+Footwear and Leather Goods Repair
 Forestry and Logging
 Fossil Fuel Electric Power Generation
 Freight and Package Transportation
 Fruit and Vegetable Preserves Manufacturing
 Fuel Cell Manufacturing
 Fundraising
-Funds and Trusts
-Funeral Services
 Furniture
 Furniture and Home Furnishings Manufacturing
 Gambling Facilities and Casinos
@@ -176,8 +172,11 @@ Government Relations
 Government Relations Services
 Graphic Design
 Ground Passenger Transportation
+HVAC and Refrigeration Equipment Manufacturing
+Headhunting
 Health and Human Services
 Health, Wellness & Fitness
+Health, Wellness and Fitness
 Higher Education
 Highway, Street, and Bridge Construction
 Historical Sites
@@ -188,36 +187,15 @@ Hospitality
 Hospitals
 Hospitals and Health Care
 Hotels and Motels
-Household and Institutional Furniture Manufacturing
 Household Appliance Manufacturing
 Household Services
-Housing and Community Development
+Household and Institutional Furniture Manufacturing
 Housing Programs
+Housing and Community Development
 Human Resources
 Human Resources Services
-HVAC and Refrigeration Equipment Manufacturing
+Human resources
 Hydroelectric Power Generation
-Import & Export
-Individual and Family Services
-Industrial Automation
-Industrial Machinery Manufacturing
-Industry Associations
-Information Services
-Information Technology & Services
-Insurance
-Insurance Agencies and Brokerages
-Insurance and Employee Benefit Funds
-Insurance Carriers
-Interior Design
-International Affairs
-International Trade and Development
-Internet Marketplace Platforms
-Internet News
-Internet Publishing
-Interurban and Rural Bus Services
-Investment Advice
-Investment Banking
-Investment Management
 IT Services and IT Consulting
 IT System Custom Software Development
 IT System Data Services
@@ -226,6 +204,31 @@ IT System Installation and Disposal
 IT System Operations and Maintenance
 IT System Testing and Evaluation
 IT System Training and Support
+Import & Export
+Import at Export
+Individual and Family Services
+Industrial Automation
+Industrial Machinery Manufacturing
+Industry Associations
+Information Services
+Information Technology & Services
+Information Technology and Services
+Insurance
+Insurance Agencies and Brokerages
+Insurance Carriers
+Insurance and Employee Benefit Funds
+Interior Design
+Interior design
+International Affairs
+International Trade and Development
+International Trade at Development
+Internet Marketplace Platforms
+Internet News
+Internet Publishing
+Interurban and Rural Bus Services
+Investment Advice
+Investment Banking
+Investment Management
 Janitorial Services
 Landscaping Services
 Language Schools
@@ -233,7 +236,9 @@ Laundry and Drycleaning Services
 Law Enforcement
 Law Practice
 Leasing Non-residential Real Estate
+Leasing Real Estat Nonhunian
 Leasing Residential Real Estate
+Leasing ng Non-residential Real Estate
 Leather Product Manufacturing
 Legal Services
 Legislative Offices
@@ -251,21 +256,25 @@ Market Research
 Marketing Services
 Mattress and Blinds Manufacturing
 Measuring and Control Instrument Manufacturing
-Meat Products Manufacturing
 Mechanical Or Industrial Engineering
-Media and Telecommunications
+Mechanical or Industrial Engineering
 Media Production
-Medical and Diagnostic Laboratories
+Media and Telecommunications
 Medical Device
+Medical Devices
 Medical Equipment Manufacturing
 Medical Practices
+Medical and Diagnostic Laboratories
 Mental Health Care
 Metal Ore Mining
 Metal Treatments
 Metal Valve, Ball, and Roller Manufacturing
 Metalworking Machinery Manufacturing
+Mga Bed-and-Breakfast, Hostel, Homestay
+Mga Entertainment Provider
+Mga Internet Marketplace Platform
+Mga Philanthropic Fundraising Service
 Military and International Affairs
-Mining
 Mobile Computing Software Products
 Mobile Food Services
 Mobile Gaming Apps
@@ -284,21 +293,25 @@ Newspaper Publishing
 Non-profit Organization Management
 Non-profit Organizations
 Nonmetallic Mineral Mining
+Nonprofit Organization Management
 Nonresidential Building Construction
 Nuclear Electric Power Generation
 Nursing Homes and Residential Care Facilities
 Office Administration
 Office Furniture and Fixtures Manufacturing
+Oil Extraction
 Oil and Coal Product Manufacturing
 Oil and Gas
-Oil Extraction
 Oil, Gas, and Mining
-Online and Mail Order Retail
 Online Audio and Video Media
+Online Audio at Video Media
 Online Media
+Online and Mail Order Retail
 Operations Consulting
+Operations management consulting
 Optometrists
 Outpatient Care Centers
+Outsourcing & Offshoring
 Outsourcing and Offshoring Consulting
 Outsourcing/Offshoring
 Packaging & Containers
@@ -306,14 +319,12 @@ Packaging and Containers Manufacturing
 Paint, Coating, and Adhesive Manufacturing
 Paper & Forest Products
 Paper and Forest Product Manufacturing
-Parts Distribution
 Pension Funds
-Performing Arts
 Performing Arts and Spectator Sports
 Periodical Publishing
-Personal and Laundry Services
 Personal Care Product Manufacturing
 Personal Care Services
+Personal and Laundry Services
 Pet Services
 Pharmaceutical Manufacturing
 Philanthropic Fundraising Services
@@ -322,12 +333,12 @@ Photography
 Physical, Occupational and Speech Therapists
 Physicians
 Pipeline Transportation
-Plastics and Rubber Product Manufacturing
 Plastics Manufacturing
+Plastics and Rubber Product Manufacturing
 Political Organizations
 Postal Services
-Primary and Secondary Education
 Primary Metal Manufacturing
+Primary and Secondary Education
 Printing Services
 Professional Organizations
 Professional Services
@@ -339,7 +350,6 @@ Public Policy
 Public Policy Offices
 Public Relations and Communications Services
 Public Safety
-Public Works
 Racetracks
 Radio and Television Broadcasting
 Rail Transportation
@@ -380,19 +390,20 @@ Retail Office Equipment
 Retail Office Supplies and Gifts
 Retail Pharmacies
 Retail Recyclable Materials & Used Merchandise
+Retail ng Online at Mail Order
 Reupholstery and Furniture Repair
 Robot Manufacturing
 Robotics Engineering
+Robotics engineering
 Rubber Products Manufacturing
 Satellite Telecommunications
-Savings Institutions
 School and Employee Bus Services
 Seafood Product Manufacturing
 Secretarial Schools
 Securities and Commodity Exchanges
-Security and Investigations
 Security Guards and Patrol Services
 Security Systems Services
+Security and Investigations
 Semiconductor Manufacturing
 Semiconductors
 Services for Renewable Energy
@@ -413,10 +424,11 @@ Specialty Trade Contractors
 Spectator Sports
 Sporting Goods
 Sporting Goods Manufacturing
-Sports and Recreation Instruction
 Sports Teams and Clubs
+Sports and Recreation Instruction
 Spring and Wire Product Manufacturing
 Staffing and Recruiting
+Staffing at Recruiting
 Steam and Air-Conditioning Supply
 Strategic Management Services
 Subdivision of Land
@@ -433,6 +445,8 @@ Temporary Help Services
 Textile Manufacturing
 Theater Companies
 Think Tanks
+Think tank
+Think tanks
 Tobacco
 Tobacco Manufacturing
 Translation and Localization
@@ -455,6 +469,7 @@ Veterinary Services
 Vocational Rehabilitation Services
 Warehousing
 Warehousing and Storage
+Warehousing at Storage
 Waste Collection
 Waste Treatment and Disposal
 Water Supply and Irrigation Systems
@@ -482,8 +497,10 @@ Wholesale Petroleum and Petroleum Products
 Wholesale Photography Equipment and Supplies
 Wholesale Raw Farm Products
 Wholesale Recyclable Materials
+Wholesale ng Machinery
 Wind Electric Power Generation
 Wine & Spirits
+Wine at Spirits
 Wineries
 Wireless Services
 Women's Handbag Manufacturing
