@@ -5,11 +5,14 @@ Director
 Founder
 Head
 Intern
+Junior
+Mid
+Senior
+Associate
 Manager
 Owner
 Partner
 President/Vice President
-Senior
 Specialist
 
 
