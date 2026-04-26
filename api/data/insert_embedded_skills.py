@@ -47,22 +47,6 @@ database_user = getenv("DB_USER")
 database_password = getenv("DB_PASSWORD")
 
 
-with psycopg2.connect(
-    host=HOST,
-    database=DATABASE,
-    user=database_user,
-    password=database_password
-) as conn:
-    if not conn:
-        print("Connection to the database failed!")
-        exit(1)
-    cur = conn.cursor()
-    cur.execute(f"SELECT * FROM {JOB_POSTINGS_TABLE_NAME}")  
-    rows = cur.fetchall()
-    df = pd.DataFrame(rows, columns=[desc[0] for desc in cur.description])
-    df = df[["id", "title", "description"]]
-
-
 class HardSkill(BaseModel):
     description: str = Field(description="Objective description of the hard skill or experience in English.")
     time_experience: Optional[float] = Field(description="Optional time experience in months identified for the hard skill application.")
@@ -274,7 +258,23 @@ def save_soft_skills(soft_skills_df: pd.DataFrame):
             )
             cur.execute(insert_query, values)
 
+
 # ── Run ───────────────────────────────────────────────────────────────────────
+
+with psycopg2.connect(
+    host=HOST,
+    database=DATABASE,
+    user=database_user,
+    password=database_password
+) as conn:
+    if not conn:
+        print("Connection to the database failed!")
+        exit(1)
+    cur = conn.cursor()
+    cur.execute(f"SELECT * FROM {JOB_POSTINGS_TABLE_NAME}")  
+    rows = cur.fetchall()
+    df = pd.DataFrame(rows, columns=[desc[0] for desc in cur.description])
+    df = df[["id", "title", "description"]]
 
 overall_start_time = time.time()
 chat_model = _build_llm()
