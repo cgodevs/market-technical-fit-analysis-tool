@@ -1,38 +1,15 @@
-'''
--- Create tables for hard and soft skills with embeddings
-
-CREATE TABLE soft_skills (
-    id          SERIAL PRIMARY KEY,
-    job_id      VARCHAR(255) NOT NULL REFERENCES job_postings(id) ON DELETE CASCADE,
-    skill_description TEXT NOT NULL,
-    weight      FLOAT,
-    embedding   VECTOR(3072)  -- gemini-embedding-001 output dimension
-);
-
-CREATE TABLE hard_skills (
-    id              SERIAL PRIMARY KEY,
-    job_id          VARCHAR(255) NOT NULL REFERENCES job_postings(id) ON DELETE CASCADE,
-    skill_description TEXT NOT NULL,
-    time_experience FLOAT,
-    weight          FLOAT,
-    embedding       VECTOR(3072)
-);
-'''
-
-from pgvector.psycopg2 import register_vector
-import psycopg2
 import pandas as pd
+import time
+import re
 import psycopg2
 from os import getenv
+from pgvector.psycopg2 import register_vector
 from typing import List, Optional
-from google import genai
 from pydantic import BaseModel, Field
 from multiprocessing.pool import ThreadPool
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.chat_models import init_chat_model 
-import time
-import re
-from google.genai import errors
+from google import genai
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 DEFAULT_REASONING_LLM_MODEL = "gemini-2.5-flash-lite"
@@ -74,17 +51,6 @@ def _build_llm(model_name=DEFAULT_REASONING_LLM_MODEL) -> genai.Client:
         temperature=LLM_TEMPERATURE,
         api_key=api_key
     )
-
-def embed_skill(chat_model: genai.Client, skill: str) -> List[float]:
-    try:
-        response = chat_model.models.embed_content(
-            model=EMBEDDING_MODEL,
-            contents=[skill]
-        )
-    except Exception as e:
-        print(f"Error embedding skill '{skill}': {e}")
-        return []
-    return response.embeddings[0].values
 
 def extract_skills_list(chat_model: genai.Client, text: str) -> SkillsList:
     prompt = ChatPromptTemplate.from_messages([
@@ -178,7 +144,7 @@ def embed_batch_with_retry(client: genai.Client, skills: List[str], max_retries:
                 contents=skills
             )
             return [e.values for e in response.embeddings]
-        except errors.ClientError as e:
+        except genai.errors.ClientError as e:
             is_rate_limit = (e.code == 429 or "RESOURCE_EXHAUSTED" in str(e.status))
             if not is_rate_limit or attempt == max_retries - 1:
                 raise
@@ -190,9 +156,9 @@ def embed_batch_with_retry(client: genai.Client, skills: List[str], max_retries:
 
     raise RuntimeError("Max retries exceeded")
 
-def build_embeddings(client: genai.Client, df: pd.DataFrame, batch_size: int = 100, concurrency: int = 5) -> pd.DataFrame:
+def build_embeddings(client: genai.Client, df: pd.DataFrame, column_to_embed: str, batch_size: int = 100, concurrency: int = 5) -> pd.DataFrame:
     result_df = df.copy()
-    skills = result_df["skill_description"].tolist()
+    skills = result_df[column_to_embed].tolist()
 
     batches = [skills[i:i + batch_size] for i in range(0, len(skills), batch_size)]
 
@@ -282,8 +248,8 @@ hard_skills_df, soft_skills_df = build_skills_dfs(chat_model, df)
 client = genai.Client(api_key=api_key)
 
 with ThreadPoolExecutor(max_workers=2) as executor:
-    hard_emb_future = executor.submit(build_embeddings, client, hard_skills_df)
-    soft_emb_future = executor.submit(build_embeddings, client, soft_skills_df)
+    hard_emb_future = executor.submit(build_embeddings, client, hard_skills_df, "skill_description" )
+    soft_emb_future = executor.submit(build_embeddings, client, soft_skills_df, "skill_description" )
     hard_skills_df_with_embeddings = hard_emb_future.result()
     soft_skills_df_with_embeddings = soft_emb_future.result()
 

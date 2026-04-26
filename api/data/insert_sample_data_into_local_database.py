@@ -66,31 +66,6 @@ transformed_df
 # Save data to local database
 # =============================================================================== #
 
-# CREATE TABLE job_postings (
-#     id                      VARCHAR(255) PRIMARY KEY,
-#     date_posted             DATE,
-#     date_created            DATE,
-#     title                   VARCHAR(255)        NOT NULL,
-#     description             TEXT                NOT NULL,
-#     url                     TEXT,
-#     country                 VARCHAR(100),
-#     location                VARCHAR(255),
-#     organization            VARCHAR(255),
-#     organization_logo       TEXT,
-#     linkedin_org_url        TEXT,
-#     weight                  SMALLINT            DEFAULT 1,
-#     c_source                VARCHAR(100),
-#     f_ai_min_seniority      VARCHAR(50),
-#     ai_experience_time_months   SMALLINT,
-#     ai_industries               VARCHAR(255)[]
-# );
-# 
-# -- Indexes for common query patterns
-# CREATE INDEX idx_job_postings_date_posted       ON job_postings (date_posted DESC);
-# CREATE INDEX idx_job_postings_date_created      ON job_postings (date_created DESC);
-# CREATE INDEX idx_job_postings_country           ON job_postings (country);
-
-
 database_user = getenv("DB_USER")
 database_password = getenv("DB_PASSWORD")
 HOST = "localhost"
