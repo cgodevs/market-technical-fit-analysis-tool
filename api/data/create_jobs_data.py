@@ -1,166 +1,56 @@
+"""
+ETL pipeline: LinkedIn API → enriched job postings → PostgreSQL.
+
+Stages:
+  1. Load      – read raw JSON
+  2. Filter    – select columns, deduplicate
+  3. Transform – rename, normalize, add metadata columns
+  4. Enrich    – embed job titles → top industries; LLM seniority extraction
+  5. Save      – bulk-insert into PostgreSQL
+"""
+
+from __future__ import annotations
+
 import json
-import pandas as pd
-import time
 import re
-import psycopg2
-import numpy as np
+import time
 from os import getenv
-from typing import List, Optional
-from pydantic import BaseModel, Field
-from multiprocessing.pool import ThreadPool
-from langchain_core.prompts import ChatPromptTemplate
-from langchain.chat_models import init_chat_model 
-from google import genai
+from typing import Optional
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-DEFAULT_REASONING_LLM_MODEL = "gemini-2.5-flash-lite"
+import psycopg2
+import numpy as np
+import pandas as pd
+from pydantic import BaseModel, Field
+from google import genai
+from langchain.chat_models import init_chat_model
+from langchain_core.prompts import ChatPromptTemplate
+
+# ---------------------------------------------------------------------------
+# Configuration
+# ---------------------------------------------------------------------------
+
+MODEL_NAME = "gemini-2.5-flash-lite"
 EMBEDDING_MODEL = "gemini-embedding-001"
 LLM_PROVIDER = "google_genai"
 LLM_TEMPERATURE = 0.5
-HOST = "localhost"
-DATABASE = "market_fit"
-JOB_POSTINGS_TABLE_NAME = "job_postings"
-api_key = getenv('GEMINI_API_KEY')
-database_user = getenv("DB_USER")
-database_password = getenv("DB_PASSWORD")
 
+DB_HOST = "localhost"
+DB_NAME = "market_fit"
+DB_USER = getenv("DB_USER")
+DB_PASSWORD = getenv("DB_PASSWORD")
+GEMINI_API_KEY = getenv("GEMINI_API_KEY")
 
-class SeniorityExtraction(BaseModel):
-    min_seniority: str = Field(description="Minimum seniority level required for the position. Must be one of: Intern, Junior, Mid, Senior, Associate, Specialist, Manager, Director, Head, President/Vice President, C-Level, Partner, Owner, Founder.")
-    time_experience_months: Optional[float] = Field(description="Minimum time of experience in months explicitly or implicitly required for the position. Null if not mentioned.")
+JOB_POSTINGS_TABLE = "job_postings"
+SOURCE_FILE = "./api/data/linkedin_api.json"
 
-def _build_llm(model_name=DEFAULT_REASONING_LLM_MODEL) -> genai.Client:
-    return init_chat_model(
-        model=model_name,
-        model_provider=LLM_PROVIDER,
-        temperature=LLM_TEMPERATURE,
-        api_key=api_key
-    )
+COLUMNS_TO_KEEP = [
+    "id", "date_posted", "date_created", "title", "description_text",
+    "seniority", "url", "countries_derived", "locations_derived",
+    "organization", "organization_logo", "linkedin_org_url",
+]
 
-def embed_batch_with_retry(client: genai.Client, skills: List[str], max_retries: int = 3) -> List[List[float]]:
-    for attempt in range(max_retries):
-        try:
-            response = client.models.embed_content(
-                model=EMBEDDING_MODEL,
-                contents=skills
-            )
-            return [e.values for e in response.embeddings]
-        except genai.errors.ClientError as e:
-            is_rate_limit = (e.code == 429 or "RESOURCE_EXHAUSTED" in str(e.status))
-            if not is_rate_limit or attempt == max_retries - 1:
-                raise
-
-            match = re.search(r'retry in (\d+(?:\.\d+)?)s', str(e))
-            wait = float(match.group(1)) if match else (2 ** attempt * 10)
-            print(f"Rate limited. Waiting {wait:.0f}s before retry {attempt + 1}/{max_retries}...")
-            time.sleep(wait)
-
-    raise RuntimeError("Max retries exceeded")
-
-def build_embeddings(client: genai.Client, df: pd.DataFrame, column_to_embed: str, batch_size: int = 100, concurrency: int = 5) -> pd.DataFrame:
-    result_df = df.copy()
-    skills = result_df[column_to_embed].tolist()
-    batches = [skills[i:i + batch_size] for i in range(0, len(skills), batch_size)]
-
-    with ThreadPool(concurrency) as pool:
-        batch_results = pool.map(lambda batch: embed_batch_with_retry(client, batch), batches)
-
-    embeddings = [emb for batch in batch_results for emb in batch]
-    result_df["embedding"] = embeddings
-    return result_df
-
-def extract_seniority(chat_model, text: str) -> SeniorityExtraction:
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", """
-            You are an expert technical recruiter specializing in seniority assessment.
-            Your task is to extract the MINIMUM seniority level and experience time required for a job position.
-
-            ## Seniority Levels (ordered from lowest to highest)
-            Intern, Junior, Mid, Senior, Associate, Specialist, Manager, Director, Head, President/Vice President, C-Level, Partner, Owner, Founder
-
-            ## Rules
-            0. Sometimes the Seniority will be hardcoded in the input given. In that case, just return it without overthinking.
-            1. Pick the MINIMUM seniority level that would be accepted for the role — not the ideal candidate.
-            2. If the job says "Senior or above", the minimum is Senior.
-            3. If no seniority is explicitly mentioned, infer it from context:
-               - Internship/trainee programs → Intern
-               - "Entry level" or < 2 years experience → Junior
-               - 2–4 years experience → Mid
-               - 5+ years experience → Senior
-               - People management responsibilities → Manager or above
-            4. `time_experience_months`: convert years to months (e.g. "3 years" → 36.0).
-               Only populate if a duration is explicitly stated or strongly implied. Otherwise null.
-            5. Output must use exactly one of the allowed seniority strings.
-        """),
-        ("human", "{input}")
-    ])
-
-    structured_llm = chat_model.with_structured_output(schema=SeniorityExtraction)
-    chain = prompt | structured_llm
-    return chain.invoke({"input": text})
-
-def process_row_seniority(chat_model, row: dict) -> tuple:
-    job_id = row["id"]
-    text = f"Job title: {row['title']}\nJob description: {row['description']}\nHardcoded seniority: {row['f_ai_min_seniority']}"
-    try:
-        result = extract_seniority(chat_model, text)
-    except Exception as e:
-        print(f"Error processing job_id {job_id}: {e}")
-        result = SeniorityExtraction(min_seniority="Mid", time_experience_months=None)
-    return job_id, result
-
-def build_seniority_df(chat_model, df: pd.DataFrame, concurrency: int = 10) -> pd.DataFrame:
-    rows = df.to_dict(orient="records")
-
-    with ThreadPool(concurrency) as pool:
-        results = pool.map(lambda row: process_row_seniority(chat_model, row), rows)
-
-    records = []
-    for job_id, result in results:
-        records.append({
-            "job_id": job_id,
-            "f_ai_min_seniority": result.min_seniority,
-            "ai_experience_time_months": result.time_experience_months
-        })
-
-    return pd.DataFrame(records)
-
-# =============================================================================== #
-# Filter Relevant Data
-# =============================================================================== #
-
-COLUMNS_SELECTION = ["id", "date_posted", "date_created", "title", "description_text", "seniority", "url", "countries_derived", "locations_derived", "organization", "organization_logo", "linkedin_org_url"]
-
-with open("./api/data/linkedin_api.json") as f:
-    data = json.load(f)
-    df = pd.DataFrame(data)
-    selected_columns_df = df[COLUMNS_SELECTION] 
-
-# Give more weight to job postings similar to each other and avoid cluttering database with its duplicates.
-selected_columns_df["weight"] = selected_columns_df.groupby(["organization", "title", "description_text"])["id"].transform("count")    
-filtered_df = selected_columns_df.drop_duplicates(subset=["organization", "title", "description_text"])
-
-# =============================================================================== #
-# Transform Data
-# =============================================================================== #
-
-renamed_columns = {
-    "description_text": "description",
-    "countries_derived": "country",
-    "locations_derived": "location"
-}
-country = lambda x: x["country"][0] if x["country"] else None
-location = lambda x: x["location"][0] if x["location"] else None
-
-transformed_df = filtered_df.rename(columns=renamed_columns)
-
-transformed_df["country"] = transformed_df.apply(country, axis=1)
-transformed_df["location"] = transformed_df.apply(location, axis=1)
-
-transformed_df["date_posted"] = transformed_df["date_posted"].apply(lambda x: x.split("T")[0] if x else None)
-transformed_df["date_created"] = transformed_df["date_created"].apply(lambda x: x.split("T")[0] if x else None)
-
-renamed_seniority = {
+SENIORITY_MAP = {
     "Pleno-sênior": "Mid",
     "Não aplicável": None,
     "Assistente": "Junior",
@@ -172,117 +62,317 @@ renamed_seniority = {
     "Confirmé": None,
     "Associate": "Associate",
     "Estagiário": "Intern",
-    "Estágio": "Intern"
+    "Estágio": "Intern",
 }
-transformed_df.replace({"seniority": renamed_seniority}, inplace=True)
 
-transformed_df["c_source"] = "LinkedIn API"
-transformed_df["f_ai_min_seniority"] = transformed_df["seniority"]
-transformed_df["ai_experience_time_months"] = None
-transformed_df["ai_industries"] = None  # List of industries extracted from job description using AI
+SENIORITY_LEVELS = (
+    "Intern", "Junior", "Mid", "Senior", "Associate", "Specialist",
+    "Manager", "Director", "Head", "President/Vice President",
+    "C-Level", "Partner", "Owner", "Founder",
+)
 
-del transformed_df["seniority"]
+EMBED_BATCH_SIZE = 100
+EMBED_CONCURRENCY = 5
+SENIORITY_CONCURRENCY = 10
+INDUSTRY_CONCURRENCY = 8
+TOP_INDUSTRIES = 3
+EMBED_MAX_RETRIES = 3
 
-# =============================================================================== #
-# Enrich data
-# =============================================================================== #
-client = genai.Client(api_key=api_key)
-chat_model = _build_llm()
+# ---------------------------------------------------------------------------
+# Schemas
+# ---------------------------------------------------------------------------
 
-with psycopg2.connect(
-    host=HOST,
-    database=DATABASE,
-    user=database_user,
-    password=database_password
-) as conn:
-    if not conn:
-        print("Connection to the database failed!")
-        exit(1)
-    cur = conn.cursor()
-    cur.execute(f"""
-        SELECT 
-            id, 
-            title,
-            embedding 
-        FROM work_industries
-    """)
-    rows = cur.fetchall()
-    industries_df = pd.DataFrame(rows, columns=[desc[0] for desc in cur.description])
-    industries_df["embedding"] = industries_df["embedding"].apply(
-        lambda x: np.array(json.loads(x), dtype=np.float32) if isinstance(x, str) else np.array(x, dtype=np.float32)
+class SeniorityExtraction(BaseModel):
+    min_seniority: str = Field(
+        description=f"Minimum seniority level. Must be one of: {', '.join(SENIORITY_LEVELS)}."
+    )
+    time_experience_months: Optional[float] = Field(
+        description="Minimum months of experience required. Null if not mentioned."
     )
 
-jobs_titles_df = transformed_df[["id", "title"]]
-jobs_titles_df["title_embedding"] = build_embeddings(client, jobs_titles_df, "title")["embedding"]
-jobs_titles_df["ai_industries"] = None  
+# ---------------------------------------------------------------------------
+# Embedding helpers
+# ---------------------------------------------------------------------------
 
-industry_embeddings_matrix = np.vstack(industries_df["embedding"].values)
-industry_titles = industries_df["title"].values
+def _embed_batch_with_retry(
+    client: genai.Client,
+    texts: list[str],
+    max_retries: int = EMBED_MAX_RETRIES,
+) -> list[list[float]]:
+    """Embed a batch of strings, retrying on rate-limit errors."""
+    for attempt in range(max_retries):
+        try:
+            response = client.models.embed_content(model=EMBEDDING_MODEL, contents=texts)
+            return [e.values for e in response.embeddings]
+        except genai.errors.ClientError as exc:
+            is_rate_limit = exc.code == 429 or "RESOURCE_EXHAUSTED" in str(exc.status)
+            if not is_rate_limit or attempt == max_retries - 1:
+                raise
+            match = re.search(r"retry in (\d+(?:\.\d+)?)s", str(exc))
+            wait = float(match.group(1)) if match else 2 ** attempt * 10
+            print(f"Rate limited — waiting {wait:.0f}s (attempt {attempt + 1}/{max_retries})")
+            time.sleep(wait)
+    raise RuntimeError("Max retries exceeded")
 
-def find_top_industries_for_job_title(job_title_embedding, top_k=3):
-    vec = np.array(job_title_embedding)
-    # Vectorized cosine similarity against all industries at once
-    norms = np.linalg.norm(industry_embeddings_matrix, axis=1) * np.linalg.norm(vec)
-    similarities = industry_embeddings_matrix @ vec / norms
-    top_indices = np.argpartition(similarities, -top_k)[-top_k:]
-    top_indices = top_indices[np.argsort(similarities[top_indices])[::-1]]
-    return industry_titles[top_indices].tolist()
 
-def process_row_industry(row):
-    return row.name, find_top_industries_for_job_title(row["title_embedding"])
+def embed_texts(
+    client: genai.Client,
+    texts: list[str],
+    batch_size: int = EMBED_BATCH_SIZE,
+    concurrency: int = EMBED_CONCURRENCY,
+) -> list[list[float]]:
+    """Embed an arbitrary list of texts in parallel batches."""
+    batches = [texts[i : i + batch_size] for i in range(0, len(texts), batch_size)]
+    results: list[list[list[float]]] = [None] * len(batches)  # type: ignore[list-item]
 
-results = {}
-with ThreadPoolExecutor(max_workers=8) as executor:
-    futures = {executor.submit(process_row_industry, row): row.name for _, row in jobs_titles_df.iterrows()}
-    for future in as_completed(futures):
-        idx, industries = future.result()
-        results[idx] = industries
+    with ThreadPoolExecutor(max_workers=concurrency) as pool:
+        futures = {pool.submit(_embed_batch_with_retry, client, b): i for i, b in enumerate(batches)}
+        for future in as_completed(futures):
+            results[futures[future]] = future.result()
 
-for idx, industries in results.items():
-    jobs_titles_df.at[idx, "ai_industries"] = industries
+    return [emb for batch in results for emb in batch]
 
-ai_enriched_df = transformed_df\
-    .merge(jobs_titles_df[["id", "ai_industries"]], on="id", how="left")\
-    .drop(columns=["ai_industries_x"])\
-    .rename(columns={"ai_industries_y": "ai_industries"})
+# ---------------------------------------------------------------------------
+# Industry matching
+# ---------------------------------------------------------------------------
 
-seniority_df = build_seniority_df(chat_model=chat_model, df=ai_enriched_df)
-seniority_df["ai_experience_time_months"] = seniority_df["ai_experience_time_months"].fillna(0)
+def cosine_similarity_matrix(query: np.ndarray, matrix: np.ndarray) -> np.ndarray:
+    """Return cosine similarities between a single query vector and every row of matrix."""
+    query_norm = np.linalg.norm(query)
+    row_norms = np.linalg.norm(matrix, axis=1)
+    return (matrix @ query) / (row_norms * query_norm + 1e-10)
 
-final_enriched_df = ai_enriched_df\
-    .merge(seniority_df, left_on="id", right_on="job_id", how="left")\
-    .drop(columns=["job_id", "f_ai_min_seniority_x", "ai_experience_time_months_x"])\
-    .rename(columns={"f_ai_min_seniority_y": "f_ai_min_seniority", "ai_experience_time_months_y": "ai_experience_time_months"})
 
-# =============================================================================== #
-# Save data to local database
-# =============================================================================== #
+def top_k_industries(
+    job_embedding: list[float],
+    industry_matrix: np.ndarray,
+    industry_titles: np.ndarray,
+    k: int = TOP_INDUSTRIES,
+) -> list[str]:
+    vec = np.asarray(job_embedding, dtype=np.float32)
+    sims = cosine_similarity_matrix(vec, industry_matrix)
+    top_idx = np.argpartition(sims, -k)[-k:]
+    top_idx = top_idx[np.argsort(sims[top_idx])[::-1]]
+    return industry_titles[top_idx].tolist()
 
-with psycopg2.connect(
-    host=HOST,
-    database=DATABASE,
-    user=database_user,
-    password=database_password
-) as conn:
 
-    if conn:
-        print("Connection to the database was successful!")
-        conn.autocommit = True
+def assign_industries(
+    titles_and_embeddings: list[tuple[str, list[float]]],
+    industry_matrix: np.ndarray,
+    industry_titles: np.ndarray,
+    concurrency: int = INDUSTRY_CONCURRENCY,
+) -> list[list[str]]:
+    """Return a list of industry lists, one per input title embedding."""
+    results = [None] * len(titles_and_embeddings)  # type: ignore[list-item]
+    with ThreadPoolExecutor(max_workers=concurrency) as pool:
+        futures = {
+            pool.submit(top_k_industries, emb, industry_matrix, industry_titles): i
+            for i, (_, emb) in enumerate(titles_and_embeddings)
+        }
+        for future in as_completed(futures):
+            results[futures[future]] = future.result()
+    return results
 
-    cur = conn.cursor()
+# ---------------------------------------------------------------------------
+# Seniority extraction
+# ---------------------------------------------------------------------------
 
-    for index, row in final_enriched_df.iterrows():
-        insert_query = f"""
-            INSERT INTO {JOB_POSTINGS_TABLE_NAME} (
-                id, date_posted, date_created, title, description, url, country, location,
-                organization, organization_logo, linkedin_org_url, weight, c_source,
-                f_ai_min_seniority, ai_experience_time_months, ai_industries
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            --ON CONFLICT (id) DO NOTHING
-        """
-        values = (
-            row["id"], row["date_posted"], row["date_created"], row["title"], row["description"], row["url"], row["country"], row["location"],
-            row["organization"], row["organization_logo"], row["linkedin_org_url"], row["weight"], row["c_source"],
-            row["f_ai_min_seniority"], row["ai_experience_time_months"], row["ai_industries"]
-        )
-        cur.execute(insert_query, values)
+def _build_seniority_chain(chat_model):
+    prompt = ChatPromptTemplate.from_messages([
+        ("system", f"""
+            You are an expert technical recruiter specializing in seniority assessment.
+            Extract the MINIMUM seniority level and experience duration required for the role.
+
+            Seniority levels (lowest → highest):
+            {", ".join(SENIORITY_LEVELS)}
+
+            Rules:
+            1. If seniority is already hardcoded in the input, return it as-is.
+            2. Pick the MINIMUM accepted level — not the ideal candidate.
+            3. If no seniority is explicit, infer from context:
+            - Internship/trainee → Intern
+            - Entry level / < 2 years → Junior
+            - 2–4 years → Mid
+            - 5+ years → Senior
+            - People management → Manager or above
+            4. time_experience_months: convert years to months (3 years → 36.0).
+            Leave null if no duration is stated or implied.
+            5. Output must use exactly one of the allowed seniority strings.
+        """),
+        ("human", "{input}"),
+    ])
+    return prompt | chat_model.with_structured_output(schema=SeniorityExtraction)
+
+
+def _extract_seniority_for_row(chain, row: dict) -> tuple[str, SeniorityExtraction]:
+    text = (
+        f"Job title: {row['title']}\n"
+        f"Job description: {row['description']}\n"
+        f"Hardcoded seniority: {row['f_ai_min_seniority']}"
+    )
+    try:
+        result = chain.invoke({"input": text})
+    except Exception as exc:
+        print(f"Seniority extraction failed for job {row['id']}: {exc}")
+        result = SeniorityExtraction(min_seniority="Mid", time_experience_months=None)
+    return row["id"], result
+
+
+def extract_seniority_bulk(
+    chat_model,
+    df: pd.DataFrame,
+    concurrency: int = SENIORITY_CONCURRENCY,
+) -> pd.DataFrame:
+    """Return a DataFrame with job_id, f_ai_min_seniority, ai_experience_time_months."""
+    chain = _build_seniority_chain(chat_model)
+    rows = df.to_dict(orient="records")
+
+    records = [None] * len(rows)  # type: ignore[list-item]
+    with ThreadPoolExecutor(max_workers=concurrency) as pool:
+        futures = {pool.submit(_extract_seniority_for_row, chain, row): i for i, row in enumerate(rows)}
+        for future in as_completed(futures):
+            job_id, result = future.result()
+            records[futures[future]] = {
+                "job_id": job_id,
+                "f_ai_min_seniority": result.min_seniority,
+                "ai_experience_time_months": result.time_experience_months or 0.0,
+            }
+
+    return pd.DataFrame(records)
+
+# ---------------------------------------------------------------------------
+# Database helpers
+# ---------------------------------------------------------------------------
+
+def db_connect() -> psycopg2.extensions.connection:
+    return psycopg2.connect(
+        host=DB_HOST, dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD
+    )
+
+
+def load_industries_from_db(conn) -> tuple[np.ndarray, np.ndarray]:
+    """Return (embeddings_matrix, titles_array) for all work_industries rows."""
+    with conn.cursor() as cur:
+        cur.execute("SELECT title, embedding FROM work_industries")
+        rows = cur.fetchall()
+
+    titles = np.array([r[0] for r in rows])
+    embeddings = np.vstack([
+        np.array(json.loads(r[1]) if isinstance(r[1], str) else r[1], dtype=np.float32)
+        for r in rows
+    ])
+    return embeddings, titles
+
+
+def bulk_insert_jobs(conn, df: pd.DataFrame, table: str = JOB_POSTINGS_TABLE) -> None:
+    columns = [
+        "id", "date_posted", "date_created", "title", "description", "url",
+        "country", "location", "organization", "organization_logo",
+        "linkedin_org_url", "weight", "c_source", "f_ai_min_seniority",
+        "ai_experience_time_months", "ai_industries",
+    ]
+    records = [tuple(row[c] for c in columns) for _, row in df[columns].iterrows()]
+
+    insert_sql = f"""
+        INSERT INTO {table} ({", ".join(columns)})
+        VALUES %s
+    """
+    with conn.cursor() as cur:
+        psycopg2.extras.execute_values(cur, insert_sql, records, page_size=500)
+    conn.commit()
+    print(f"Inserted {len(records)} rows into {table}.")
+
+# ---------------------------------------------------------------------------
+# ETL stages
+# ---------------------------------------------------------------------------
+
+def load(path: str) -> pd.DataFrame:
+    with open(path) as f:
+        return pd.DataFrame(json.load(f))
+
+
+def filter_and_deduplicate(df: pd.DataFrame) -> pd.DataFrame:
+    df = df[COLUMNS_TO_KEEP].copy()
+    df["weight"] = df.groupby(["organization", "title", "description_text"])["id"].transform("count")
+    return df.drop_duplicates(subset=["organization", "title", "description_text"])
+
+
+def transform(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.rename(columns={
+        "description_text": "description",
+        "countries_derived": "country",
+        "locations_derived": "location",
+    })
+
+    df["country"] = df["country"].apply(lambda x: x[0] if x else None)
+    df["location"] = df["location"].apply(lambda x: x[0] if x else None)
+    df["date_posted"] = df["date_posted"].apply(lambda x: x.split("T")[0] if x else None)
+    df["date_created"] = df["date_created"].apply(lambda x: x.split("T")[0] if x else None)
+
+    df["seniority"] = df["seniority"].map(lambda v: SENIORITY_MAP.get(v, v if v in SENIORITY_LEVELS else None))
+
+    df["c_source"] = "LinkedIn API"
+    df["f_ai_min_seniority"] = df["seniority"]
+    df["ai_experience_time_months"] = None
+    df["ai_industries"] = None
+
+    return df.drop(columns=["seniority"])
+
+
+def enrich(df: pd.DataFrame, gemini_client: genai.Client, chat_model) -> pd.DataFrame:
+    # --- Industries via embeddings ---
+    with db_connect() as conn:
+        industry_matrix, industry_titles = load_industries_from_db(conn)
+
+    title_embeddings = embed_texts(gemini_client, df["title"].tolist())
+    titles_with_embeddings = list(zip(df["title"].tolist(), title_embeddings))
+    industry_lists = assign_industries(titles_with_embeddings, industry_matrix, industry_titles)
+    df = df.copy()
+    df["ai_industries"] = industry_lists
+
+    # --- Seniority via LLM ---
+    seniority_df = extract_seniority_bulk(chat_model, df)
+    df = df.merge(seniority_df, left_on="id", right_on="job_id", how="left", suffixes=("_old", ""))
+    df = df.drop(columns=["job_id", "f_ai_min_seniority_old", "ai_experience_time_months_old"])
+
+    return df
+
+
+def save(df: pd.DataFrame) -> None:
+    with db_connect() as conn:
+        bulk_insert_jobs(conn, df)
+
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
+
+def main() -> None:
+    start_time = time.time()
+    chat_model = init_chat_model(
+        model=MODEL_NAME,
+        model_provider=LLM_PROVIDER,
+        temperature=LLM_TEMPERATURE,
+        api_key=GEMINI_API_KEY,
+    )
+    print("Loading data...")
+    raw_df = load(SOURCE_FILE)
+
+    print("Filtering and deduplicating...")
+    filtered_df = filter_and_deduplicate(raw_df)
+
+    print("Transforming...")
+    transformed_df = transform(filtered_df)
+
+    print("Enriching (embeddings + seniority LLM)...")
+    gemini_client = genai.Client(api_key=GEMINI_API_KEY)
+    enriched_df = enrich(transformed_df, gemini_client, chat_model)
+
+    print("Saving to database...")
+    save(enriched_df)
+
+    print(f"Total processing time: {(time.time() - start_time) / 60:.2f} minutes")
+    print("Done.")
+
+
+if __name__ == "__main__":
+    main()
