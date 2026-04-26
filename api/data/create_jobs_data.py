@@ -5,7 +5,6 @@ import re
 import psycopg2
 import numpy as np
 from os import getenv
-from pgvector.psycopg2 import register_vector
 from typing import List, Optional
 from pydantic import BaseModel, Field
 from multiprocessing.pool import ThreadPool
@@ -25,25 +24,10 @@ api_key = getenv('GEMINI_API_KEY')
 database_user = getenv("DB_USER")
 database_password = getenv("DB_PASSWORD")
 
-class HardSkill(BaseModel):
-    description: str = Field(description="Objective description of the hard skill or experience in English.")
-    time_experience: Optional[float] = Field(description="Optional time experience in months identified for the hard skill application.")
-    weight: Optional[float] = Field(description="Optional weighted relevance score for the hard skill application in general for the position, ranging from 0 to 1.")
 
-class HardSkillList(BaseModel):
-    hard_skills: List[HardSkill] = Field(description="List of hard skills extracted from a job description.")
-
-class SoftSkill(BaseModel):
-    description: str = Field(description="Concise canonical name of the soft skill in English (e.g. 'Stakeholder Communication', 'Proactive Communication').")
-    weight: Optional[float] = Field(description="Weighted relevance score for this soft skill for the position, ranging from 0 to 1.")
-
-class SoftSkillList(BaseModel):
-    soft_skills: List[SoftSkill] = Field(description="List of soft skills extracted from a job description.")
-
-class SkillsList(BaseModel):
-    hard_skills: List[HardSkill] = Field(description="List of hard skills extracted from a job description.")
-    soft_skills: List[SoftSkill] = Field(description="List of soft skills extracted from a job description.")
-
+class SeniorityExtraction(BaseModel):
+    min_seniority: str = Field(description="Minimum seniority level required for the position. Must be one of: Intern, Junior, Mid, Senior, Associate, Specialist, Manager, Director, Head, President/Vice President, C-Level, Partner, Owner, Founder.")
+    time_experience_months: Optional[float] = Field(description="Minimum time of experience in months explicitly or implicitly required for the position. Null if not mentioned.")
 
 def _build_llm(model_name=DEFAULT_REASONING_LLM_MODEL) -> genai.Client:
     return init_chat_model(
@@ -52,90 +36,6 @@ def _build_llm(model_name=DEFAULT_REASONING_LLM_MODEL) -> genai.Client:
         temperature=LLM_TEMPERATURE,
         api_key=api_key
     )
-
-def extract_skills_list(chat_model: genai.Client, text: str) -> SkillsList:
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", """
-            You are an expert technical recruiter and organizational psychologist specializing in behavioral competency frameworks.
-            Your task is to extract ALL hard and soft skills from a job description and assign each a relevance weight.
-
-            ## Hard Skills
-            Extract specific tools, technologies, methodologies, and domain knowledge.
-
-            ### Rules
-            1. Extract BOTH the broad category AND each specific tool/technology mentioned within it.
-               - Example: "ETL (SSIS or Azure)" → extract `ETL`, `SSIS`, and `Azure` as separate entries.
-            2. Use concise canonical names in English (e.g. `SQL`, `Python`, `ETL`, `Azure Data Factory`).
-               - If a skill implies a category, extract both (e.g. "Programming language (Python preferred)" → `Programming` + `Python`).
-               - For architecture/design skills use compound form: "data pipeline and analytics architectures" → `Data Pipeline Architecture` + `Data Architecture`.
-               - Not too general (`Microsoft Cloud Services` not `Microsoft`), not too specific (`Python` not `Python 3.8`).
-            3. Always extract language requirements as hard skills (`Fluent English`, `English Proficiency`).
-            4. `time_experience`: only populate if the job explicitly mentions a duration (e.g. "3+ years of Python") or interpret it as the general time of experience for the role, if mentioned. Otherwise null.
-
-            ## Soft Skills
-            Extract interpersonal, behavioral, or cognitive traits NOT tied to a specific tool, technology, or domain.
-            Examples: `Stakeholder Communication`, `Cross-functional Collaboration`, `Proactive Communication`.
-
-            ### What does NOT count as a soft skill
-            - Tool or technology proficiency (e.g. SQL, Python) → hard skill
-            - Language proficiency (e.g. Fluent English) → hard skill
-            - Domain knowledge (e.g. Data Modeling, ETL) → hard skill
-
-            ### Rules
-            1. Use short noun phrases in English (e.g. `Stakeholder Communication`, `Proactive Risk Escalation`).
-            2. If a sentence implies multiple distinct soft skills, extract each separately.
-
-            ## Weight Assignment (applies to both hard and soft skills)
-            | Signal in job description                        | Weight range |
-            |--------------------------------------------------|--------------|
-            | Required / mandatory / strongly emphasized       | 0.8 – 1.0    |
-            | Preferred / clearly mentioned                    | 0.5 – 0.7    |
-            | Desirable / implied / nice-to-have               | 0.2 – 0.4    |
-
-            - Parent categories of required tools inherit a high weight.
-            - Specific tools listed as "preferred" get slightly lower weight than their parent category.
-            - All descriptions must be in English, even if the job description is in another language.
-        """),
-        ("human", "{input}")
-    ])
-
-    structured_llm = chat_model.with_structured_output(schema=SkillsList)
-    chain = prompt | structured_llm
-    return chain.invoke({"input": text})
-
-def process_row_skills(chat_model, row: dict) -> tuple:
-    job_id = row['id']
-    text = f"Job title: {row['title']}\nJob description: {row['description']}"
-    try:
-        skills = extract_skills_list(chat_model, text)
-    except Exception as e:
-        print(f"Error processing job_id {job_id}: {e}")
-        skills = SkillsList(hard_skills=[], soft_skills=[])
-    return job_id, skills
-
-def build_skills_dfs(chat_model, df: pd.DataFrame, concurrency: int = 10) -> tuple[pd.DataFrame, pd.DataFrame]:
-    rows = df.to_dict(orient='records')
-
-    with ThreadPool(concurrency) as pool:
-        results = pool.map(lambda row: process_row_skills(chat_model, row), rows)
-
-    hard_records, soft_records = [], []
-    for job_id, skills in results:
-        for skill in skills.hard_skills:
-            hard_records.append({
-                "job_id": job_id,
-                "skill_description": skill.description,
-                "time_experience": skill.time_experience,
-                "weight": skill.weight
-            })
-        for skill in skills.soft_skills:
-            soft_records.append({
-                "job_id": job_id,
-                "skill_description": skill.description,
-                "weight": skill.weight
-            })
-
-    return pd.DataFrame(hard_records), pd.DataFrame(soft_records)
 
 def embed_batch_with_retry(client: genai.Client, skills: List[str], max_retries: int = 3) -> List[List[float]]:
     for attempt in range(max_retries):
@@ -169,61 +69,61 @@ def build_embeddings(client: genai.Client, df: pd.DataFrame, column_to_embed: st
     result_df["embedding"] = embeddings
     return result_df
 
-def save_hard_skills(hard_skills_df: pd.DataFrame):
-    with psycopg2.connect(
-        host=HOST,
-        database=DATABASE,
-        user=database_user,
-        password=database_password
-    ) as conn:
-        if conn:
-            print("Connection to the database was successful!")
-            conn.autocommit = True
-            register_vector(conn)
+def extract_seniority(chat_model, text: str) -> SeniorityExtraction:
+    prompt = ChatPromptTemplate.from_messages([
+        ("system", """
+            You are an expert technical recruiter specializing in seniority assessment.
+            Your task is to extract the MINIMUM seniority level and experience time required for a job position.
 
-        cur = conn.cursor()
-        for _, row in hard_skills_df.iterrows():
-            insert_query = """
-                INSERT INTO hard_skills (job_id, skill_description, time_experience, weight, embedding)
-                VALUES (%s, %s, %s, %s, %s)
-                ON CONFLICT DO NOTHING
-            """
-            values = (
-                row["job_id"],
-                row["skill_description"],
-                row.get("time_experience"),
-                row.get("weight"),
-                row["embedding"]
-            )
-            cur.execute(insert_query, values)
+            ## Seniority Levels (ordered from lowest to highest)
+            Intern, Junior, Mid, Senior, Associate, Specialist, Manager, Director, Head, President/Vice President, C-Level, Partner, Owner, Founder
 
-def save_soft_skills(soft_skills_df: pd.DataFrame):
-    with psycopg2.connect(
-        host=HOST,
-        database=DATABASE,
-        user=database_user,
-        password=database_password
-    ) as conn:
-        if conn:
-            print("Connection to the database was successful!")
-            conn.autocommit = True
-            register_vector(conn)
+            ## Rules
+            0. Sometimes the Seniority will be hardcoded in the input given. In that case, just return it without overthinking.
+            1. Pick the MINIMUM seniority level that would be accepted for the role — not the ideal candidate.
+            2. If the job says "Senior or above", the minimum is Senior.
+            3. If no seniority is explicitly mentioned, infer it from context:
+               - Internship/trainee programs → Intern
+               - "Entry level" or < 2 years experience → Junior
+               - 2–4 years experience → Mid
+               - 5+ years experience → Senior
+               - People management responsibilities → Manager or above
+            4. `time_experience_months`: convert years to months (e.g. "3 years" → 36.0).
+               Only populate if a duration is explicitly stated or strongly implied. Otherwise null.
+            5. Output must use exactly one of the allowed seniority strings.
+        """),
+        ("human", "{input}")
+    ])
 
-        cur = conn.cursor()
-        for _, row in soft_skills_df.iterrows():
-            insert_query = """
-                INSERT INTO soft_skills (job_id, skill_description, weight, embedding)
-                VALUES (%s, %s, %s, %s)
-                ON CONFLICT DO NOTHING
-            """
-            values = (
-                row["job_id"],
-                row["skill_description"],
-                row.get("weight"),
-                row["embedding"]
-            )
-            cur.execute(insert_query, values)
+    structured_llm = chat_model.with_structured_output(schema=SeniorityExtraction)
+    chain = prompt | structured_llm
+    return chain.invoke({"input": text})
 
+def process_row_seniority(chat_model, row: dict) -> tuple:
+    job_id = row["id"]
+    text = f"Job title: {row['title']}\nJob description: {row['description']}\nHardcoded seniority: {row['f_ai_min_seniority']}"
+    try:
+        result = extract_seniority(chat_model, text)
+    except Exception as e:
+        print(f"Error processing job_id {job_id}: {e}")
+        result = SeniorityExtraction(min_seniority="Mid", time_experience_months=None)
+    return job_id, result
+
+def build_seniority_df(chat_model, df: pd.DataFrame, concurrency: int = 10) -> pd.DataFrame:
+    rows = df.to_dict(orient="records")
+
+    with ThreadPool(concurrency) as pool:
+        results = pool.map(lambda row: process_row_seniority(chat_model, row), rows)
+
+    records = []
+    for job_id, result in results:
+        records.append({
+            "job_id": job_id,
+            "f_ai_min_seniority": result.min_seniority,
+            "ai_experience_time_months": result.time_experience_months
+        })
+
+    return pd.DataFrame(records)
 
 # =============================================================================== #
 # Filter Relevant Data
@@ -287,6 +187,7 @@ del transformed_df["seniority"]
 # Enrich data
 # =============================================================================== #
 client = genai.Client(api_key=api_key)
+chat_model = _build_llm()
 
 with psycopg2.connect(
     host=HOST,
@@ -340,9 +241,18 @@ with ThreadPoolExecutor(max_workers=8) as executor:
 for idx, industries in results.items():
     jobs_titles_df.at[idx, "ai_industries"] = industries
 
-enriched_df = transformed_df.merge(jobs_titles_df[["id", "ai_industries"]], on="id", how="left")
-enriched_df.drop(columns=["ai_industries_x"], inplace=True)
-enriched_df.rename(columns={"ai_industries_y": "ai_industries"}, inplace=True)
+ai_enriched_df = transformed_df\
+    .merge(jobs_titles_df[["id", "ai_industries"]], on="id", how="left")\
+    .drop(columns=["ai_industries_x"])\
+    .rename(columns={"ai_industries_y": "ai_industries"})
+
+seniority_df = build_seniority_df(chat_model=chat_model, df=ai_enriched_df)
+seniority_df["ai_experience_time_months"] = seniority_df["ai_experience_time_months"].fillna(0)
+
+final_enriched_df = ai_enriched_df\
+    .merge(seniority_df, left_on="id", right_on="job_id", how="left")\
+    .drop(columns=["job_id", "f_ai_min_seniority_x", "ai_experience_time_months_x"])\
+    .rename(columns={"f_ai_min_seniority_y": "f_ai_min_seniority", "ai_experience_time_months_y": "ai_experience_time_months"})
 
 # =============================================================================== #
 # Save data to local database
@@ -360,7 +270,8 @@ with psycopg2.connect(
         conn.autocommit = True
 
     cur = conn.cursor()
-    for index, row in enriched_df.iterrows():
+
+    for index, row in final_enriched_df.iterrows():
         insert_query = f"""
             INSERT INTO {JOB_POSTINGS_TABLE_NAME} (
                 id, date_posted, date_created, title, description, url, country, location,
