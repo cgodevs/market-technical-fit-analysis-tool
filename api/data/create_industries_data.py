@@ -40,7 +40,6 @@ def embed_batch_with_retry(client: genai.Client, skills: List[str], max_retries:
 def build_embeddings(client: genai.Client, df: pd.DataFrame, column_to_embed: str, batch_size: int = 100, concurrency: int = 5) -> pd.DataFrame:
     result_df = df.copy()
     skills = result_df[column_to_embed].tolist()
-
     batches = [skills[i:i + batch_size] for i in range(0, len(skills), batch_size)]
 
     with ThreadPool(concurrency) as pool:
@@ -60,7 +59,6 @@ client = genai.Client(api_key=api_key)
 title_list = get_list_of_industries_from_local_file()
 industries_df = pd.DataFrame(title_list, columns=["title"])
 industries_df_with_embeddings = build_embeddings(client, industries_df, "title")    
-
 
 with psycopg2.connect(
     host=HOST,
