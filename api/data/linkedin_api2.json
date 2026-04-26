@@ -1,0 +1,841 @@
+[
+  {
+    "id": "2125156671",
+    "date_posted": "2026-04-26T11:14:22.376",
+    "date_created": "2026-04-26T11:14:22.464863",
+    "title": "Graduate Data Engineer",
+    "organization": "Joveo AI",
+    "organization_url": "https://www.linkedin.com/company/joveo-ai",
+    "date_validthrough": null,
+    "locations_raw": [
+      {
+        "@type": "Place",
+        "address": {
+          "@type": "PostalAddress",
+          "addressRegion": "",
+          "addressCountry": "",
+          "addressLocality": "Brasil"
+        }
+      }
+    ],
+    "location_type": null,
+    "location_requirements_raw": null,
+    "salary_raw": null,
+    "employment_type": null,
+    "url": "https://br.linkedin.com/jobs/view/graduate-data-engineer-at-joveo-ai-4407114613",
+    "source_type": "jobboard",
+    "source": "linkedin",
+    "source_domain": "br.linkedin.com",
+    "organization_logo": "https://media.licdn.com/dms/image/v2/D560BAQGZaEx4qwD7IA/company-logo_100_100/B56Z2GgtYDKwAQ-/0/1776078215755/joveo_ai_logo?e=2147483647&v=beta&t=Z_c1Wdt3sOnawDucHhWZoerE4Sgjz4CUC25PsdPubQg",
+    "cities_derived": null,
+    "counties_derived": null,
+    "regions_derived": null,
+    "countries_derived": [
+      "Brazil"
+    ],
+    "locations_derived": [
+      "Brazil"
+    ],
+    "timezones_derived": [
+      "America/Cuiaba"
+    ],
+    "lats_derived": [
+      -10.3333333
+    ],
+    "lngs_derived": [
+      -53.2
+    ],
+    "remote_derived": false,
+    "linkedin_org_employees": 1,
+    "linkedin_org_url": "https://www.joveo.com",
+    "linkedin_org_size": "51-200 employees",
+    "linkedin_org_slogan": "AI-Led, High-Performance Recruitment Marketing Platform",
+    "linkedin_org_industry": "Software Development",
+    "linkedin_org_followers": null,
+    "linkedin_org_headquarters": "Menlo Park, California",
+    "linkedin_org_type": "Privately Held",
+    "linkedin_org_foundeddate": "",
+    "linkedin_org_specialties": [
+      "Recruitment",
+      "Talent Acquisition",
+      "Programmatic Job Advertising",
+      "Recruitment Marketing",
+      "HR Technology",
+      "Ad Tech",
+      "HR Tech",
+      "SaaS",
+      "Programmatic Recruitment Advertising",
+      "Job Advertising",
+      " Recruitment Advertising",
+      "Platform",
+      "Software",
+      "and ecruitment Analytics"
+    ],
+    "linkedin_org_locations": [
+      "Menlo Park, California, US"
+    ],
+    "linkedin_org_description": "As the global leader in AI-powered recruitment marketing and candidate engagement, we are transforming talent attraction and recruitment media buying for the world’s largest and smartest employers, staffing businesses, RPOs, and recruitment advertising agencies.\n\nThe Joveo platform enables businesses to attract, source, engage, and hire the most relevant candidates on time, within their budget. Powering millions of jobs every day, our data-driven recruitment marketing platform uses advanced data science and machine learning to dynamically manage and optimise talent sourcing and applications across all online channels while providing real-time insights at every step of the job seeker journey, from click to hire.\n\nFor more information, visit www.joveo.com.",
+    "linkedin_org_recruitment_agency_derived": false,
+    "seniority": "Não aplicável",
+    "directapply": true,
+    "linkedin_org_slug": "joveo-ai",
+    "no_jb_schema": true,
+    "external_apply_url": null,
+    "ats_duplicate": null,
+    "linkedin_id": 4407114613,
+    "description_text": "About Joveo:\nEvery company says they're \"AI-first.\" We actually are. Joveo's recruitment \nadvertising platform processes millions of hiring decisions through machine \nlearning, real-time bidding, and predictive analytics — helping the world's \nlargest employers find the right people, faster and fairer. But we're not \ndone. Not even close.\n\nRole: Graduate Data Engineer\nLocation: Remote\n\nRole Overview:\nWe are hiring a Graduate Data Engineer to launch your career building \nthe data infrastructure that powers Joveo's AI platform. You will \nwrite production data pipelines, learn modern data stack tools, and \ncontribute to systems that process millions of data points in real time.\n\nKey Responsibilities:\n- Build and maintain batch and real-time data pipelines under senior guidance\n- Write SQL and Python code for data transformation and ETL workflows\n- Learn cloud data platforms (BigQuery, Redshift, Snowflake) in production\n- Contribute to data quality monitoring and pipeline reliability work\n- Collaborate with data scientists and analysts to deliver clean, usable datasets\n- Grow your skills in data modeling, orchestration, and modern data engineering practices\n\nRequired Skills & Qualifications:\n- Recent graduate with a Bachelor's or Master's in Computer Science, Data Science, or related field\n- Working knowledge of Python and SQL for data manipulation\n- Understanding of database fundamentals and data modeling basics\n- Familiarity with any data pipeline tool, cloud platform, or big data technology is a plus\n- Strong analytical thinking and attention to data correctness\n- Curiosity about how data flows through real production systems\n\nEqual Opportunity Employer:\nJoveo is an equal opportunity employer. We are committed to building an \ninclusive workplace and welcome applications from all qualified individuals \nregardless of race, color, ethnicity, nationality, gender, gender identity \nor expression, sexual orientation, age, religion, disability, marital status, \nor any other characteristic protected by applicable law. All hiring decisions \nare made solely on the basis of qualifications, skills, and demonstrated \nability.\n\nIf your dream job is one that doesn't fit neatly into a job title — apply.\nJoveo. Where AI meets the future of work."
+  },
+  {
+    "id": "2125139229",
+    "date_posted": "2026-04-26T10:08:40.757",
+    "date_created": "2026-04-26T10:08:40.834907",
+    "title": "Data Engineer (Remote)",
+    "organization": "Jobs Ai",
+    "organization_url": "https://www.linkedin.com/company/jobsaii",
+    "date_validthrough": null,
+    "locations_raw": [
+      {
+        "@type": "Place",
+        "address": {
+          "@type": "PostalAddress",
+          "addressRegion": "",
+          "addressCountry": "",
+          "addressLocality": "Brasil"
+        }
+      }
+    ],
+    "location_type": null,
+    "location_requirements_raw": null,
+    "salary_raw": null,
+    "employment_type": null,
+    "url": "https://br.linkedin.com/jobs/view/data-engineer-remote-at-jobs-ai-4407126255",
+    "source_type": "jobboard",
+    "source": "linkedin",
+    "source_domain": "br.linkedin.com",
+    "organization_logo": "https://media.licdn.com/dms/image/v2/D560BAQEeXjvtRvoV1w/company-logo_100_100/B56Z0gEWqLKsAQ-/0/1774359506020/hirewaveee_logo?e=2147483647&v=beta&t=h9FRktpODAn1lM_i1WFg-7qGZvBSGx0fjxH-6dYbkPY",
+    "cities_derived": null,
+    "counties_derived": null,
+    "regions_derived": null,
+    "countries_derived": [
+      "Brazil"
+    ],
+    "locations_derived": [
+      "Brazil"
+    ],
+    "timezones_derived": [
+      "America/Cuiaba"
+    ],
+    "lats_derived": [
+      -10.3333333
+    ],
+    "lngs_derived": [
+      -53.2
+    ],
+    "remote_derived": true,
+    "linkedin_org_employees": 3,
+    "linkedin_org_url": null,
+    "linkedin_org_size": "11-50 employees",
+    "linkedin_org_slogan": "Connecting Ambition with Impact",
+    "linkedin_org_industry": "Staffing and Recruiting",
+    "linkedin_org_followers": null,
+    "linkedin_org_headquarters": "",
+    "linkedin_org_type": "Self-Owned",
+    "linkedin_org_foundeddate": "",
+    "linkedin_org_specialties": [
+      "staffing and recruitment"
+    ],
+    "linkedin_org_locations": [],
+    "linkedin_org_description": "We go beyond the traditional job board model by offering dedicated, hands-on Staffing and Placement Services. We understand that for our clients, hiring is a high-stakes investment. Our team acts as an extension of your HR department, providing tailored recruitment strategies to solve your most pressing talent gaps. Whether you are looking for executive leadership, specialised technical experts, or a full-scale team expansion, Jobs Ai provides the vetting, sourcing, and strategic advisory needed to ensure a perfect fit. We don't just fill seats; we build the foundations of your future growth.",
+    "linkedin_org_recruitment_agency_derived": true,
+    "seniority": "Não aplicável",
+    "directapply": false,
+    "linkedin_org_slug": "jobsaii",
+    "no_jb_schema": true,
+    "external_apply_url": null,
+    "ats_duplicate": null,
+    "linkedin_id": 4407126255,
+    "description_text": "Role: Data Engineer (Remote)\nLocation: Remote (Work from Anywhere)\nPayout: $50-$120/hour\n\nRole Overview:\nOne of our clients, a global leader in the Artificial Intelligence industry, is seeking a skilled Data Engineer to join their team on a contract basis. In this fully remote role, you will leverage your expertise to design, implement, and manage data pipelines for complex AI agent training initiatives. As a Data Engineer, you will collaborate with talented professionals to ensure efficient data flows and high-quality training datasets.\n\nKey Responsibilities:\n• Design, implement, and manage data pipelines to support complex AI agent training initiatives.\n• Collaborate closely with AI/ML engineers to ensure efficient data flows and high-quality training datasets.\n• Develop and maintain scalable ETL processes using Python, MySQL, and PostgreSQL.\n• Utilize Java and JavaScript to integrate diverse data sources and enable seamless data exchange.\n• Contribute to the optimization of AI models through effective data management and analysis.\n• Collaborate with cross-functional teams to ensure data quality and integrity.\n\nRequired Skills & Qualifications:\n• Expertise in data engineering, coding, and AI/ML.\n• Strong understanding of data pipelines, ETL processes, and data storage solutions.\n• Proficiency in Python, MySQL, PostgreSQL, Java, and JavaScript.\n• Experience with AI/ML model training and optimization.\n• Strong analytical and problem-solving skills.\n• Excellent communication and collaboration skills.\n\nMore About the Opportunity:\nThis is a contract opportunity with a competitive hourly rate of $50-$120. The successful candidate will have the opportunity to work on a dynamic project with a talented team of professionals.\n\nEqual Opportunity Employer:\nWe hire based on skills and expertise. All qualified candidates are welcome regardless of background, experience, or prior employment history. Applications are reviewed solely on demonstrated technical ability and qualifications.\n\nApply Now!"
+  },
+  {
+    "id": "2125138328",
+    "date_posted": "2026-04-26T09:52:46",
+    "date_created": "2026-04-26T10:08:08.74522",
+    "title": "Data Engineer (Remote)",
+    "organization": "Joveo AI",
+    "organization_url": "https://www.linkedin.com/company/joveo-ai",
+    "date_validthrough": "2026-05-26T09:52:46",
+    "locations_raw": [
+      {
+        "@type": "Place",
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "BR",
+          "addressLocality": "São Paulo",
+          "addressRegion": null,
+          "streetAddress": null
+        },
+        "latitude": -22.07027,
+        "longitude": -48.433388
+      }
+    ],
+    "location_type": "TELECOMMUTE",
+    "location_requirements_raw": [
+      {
+        "@type": "Country",
+        "name": "São Paulo, Brasil"
+      }
+    ],
+    "salary_raw": null,
+    "employment_type": [
+      "FULL_TIME"
+    ],
+    "url": "https://br.linkedin.com/jobs/view/data-engineer-remote-at-joveo-ai-4407119447",
+    "source_type": "jobboard",
+    "source": "linkedin",
+    "source_domain": "br.linkedin.com",
+    "organization_logo": "https://media.licdn.com/dms/image/v2/D560BAQGZaEx4qwD7IA/company-logo_200_200/B56Z2GgtYDKwAI-/0/1776078215755/joveo_ai_logo?e=2147483647&v=beta&t=iJhwSY4nzWFp1W-agIAJsP5-1ummr0cPdOycH3J8a-w",
+    "cities_derived": [
+      "São Paulo"
+    ],
+    "counties_derived": [
+      "Região Metropolitana de São Paulo"
+    ],
+    "regions_derived": [
+      "São Paulo"
+    ],
+    "countries_derived": [
+      "Brazil"
+    ],
+    "locations_derived": [
+      "São Paulo, São Paulo, Brazil"
+    ],
+    "timezones_derived": [
+      "America/Sao_Paulo"
+    ],
+    "lats_derived": [
+      -23.5506507
+    ],
+    "lngs_derived": [
+      -46.6333824
+    ],
+    "remote_derived": true,
+    "linkedin_org_employees": 1,
+    "linkedin_org_url": "https://www.joveo.com",
+    "linkedin_org_size": "51-200 employees",
+    "linkedin_org_slogan": "AI-Led, High-Performance Recruitment Marketing Platform",
+    "linkedin_org_industry": "Software Development",
+    "linkedin_org_followers": null,
+    "linkedin_org_headquarters": "Menlo Park, California",
+    "linkedin_org_type": "Privately Held",
+    "linkedin_org_foundeddate": "",
+    "linkedin_org_specialties": [
+      "Recruitment",
+      "Talent Acquisition",
+      "Programmatic Job Advertising",
+      "Recruitment Marketing",
+      "HR Technology",
+      "Ad Tech",
+      "HR Tech",
+      "SaaS",
+      "Programmatic Recruitment Advertising",
+      "Job Advertising",
+      " Recruitment Advertising",
+      "Platform",
+      "Software",
+      "and ecruitment Analytics"
+    ],
+    "linkedin_org_locations": [
+      "Menlo Park, California, US"
+    ],
+    "linkedin_org_description": "As the global leader in AI-powered recruitment marketing and candidate engagement, we are transforming talent attraction and recruitment media buying for the world’s largest and smartest employers, staffing businesses, RPOs, and recruitment advertising agencies.\n\nThe Joveo platform enables businesses to attract, source, engage, and hire the most relevant candidates on time, within their budget. Powering millions of jobs every day, our data-driven recruitment marketing platform uses advanced data science and machine learning to dynamically manage and optimise talent sourcing and applications across all online channels while providing real-time insights at every step of the job seeker journey, from click to hire.\n\nFor more information, visit www.joveo.com.",
+    "linkedin_org_recruitment_agency_derived": false,
+    "seniority": "Não aplicável",
+    "directapply": true,
+    "linkedin_org_slug": "joveo-ai",
+    "no_jb_schema": null,
+    "external_apply_url": null,
+    "ats_duplicate": null,
+    "linkedin_id": 4407119447,
+    "description_text": "About Joveo:\nEvery company says they're \"AI-first.\" We actually are. Joveo's recruitment \nadvertising platform processes millions of hiring decisions through machine \nlearning, real-time bidding, and predictive analytics — helping the world's \nlargest employers find the right people, faster and fairer. But we're not \ndone. Not even close.\n\nRole: Data Engineer\nLocation: Remote\n\nRole Overview:\nWe are hiring a Data Engineer to design, build, and maintain the data \ninfrastructure that fuels Joveo's machine learning models and business \nintelligence. You will work at the intersection of software engineering and \ndata — building pipelines that are reliable, scalable, and production-ready.\n\nKey Responsibilities:\n- Design and maintain scalable batch and real-time data pipelines\n- Build and manage data warehousing and lakehouse architectures\n- Ensure data quality, lineage, and observability across all pipelines\n- Collaborate with data scientists and analysts to provide clean, usable datasets\n- Optimize query performance and infrastructure costs on cloud platforms\n- Document data models, pipelines, and ingestion processes thoroughly\n\nRequired Skills & Qualifications:\n- Strong experience with Python or Scala for data pipeline development\n- Proficiency with pipeline orchestration tools (Airflow, Prefect, or similar)\n- Hands-on experience with cloud data platforms (BigQuery, Redshift, Snowflake)\n- Solid understanding of SQL and data modeling best practices\n- Experience with streaming frameworks (Kafka, Spark Streaming, or Flink)\n- Familiarity with dbt, data contracts, or modern data stack tooling\n\nEqual Opportunity Employer:\nJoveo is an equal opportunity employer. We are committed to building an \ninclusive workplace and welcome applications from all qualified individuals \nregardless of race, color, ethnicity, nationality, gender, gender identity \nor expression, sexual orientation, age, religion, disability, marital status, \nor any other characteristic protected by applicable law. All hiring decisions \nare made solely on the basis of qualifications, skills, and demonstrated \nability.\n\nIf your dream job is one that doesn't fit neatly into a job title — apply.\nJoveo. Where AI meets the future of work."
+  },
+  {
+    "id": "2124695279",
+    "date_posted": "2026-04-25T16:16:12",
+    "date_created": "2026-04-25T19:04:40.381482",
+    "title": "Graduate Data Engineer",
+    "organization": "Joveo AI",
+    "organization_url": "https://www.linkedin.com/company/joveo-ai",
+    "date_validthrough": "2026-05-25T16:16:11",
+    "locations_raw": [
+      {
+        "@type": "Place",
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "BR",
+          "addressLocality": "São Paulo",
+          "addressRegion": null,
+          "streetAddress": null
+        },
+        "latitude": -22.07027,
+        "longitude": -48.433388
+      }
+    ],
+    "location_type": "TELECOMMUTE",
+    "location_requirements_raw": [
+      {
+        "@type": "Country",
+        "name": "São Paulo, Brasil"
+      }
+    ],
+    "salary_raw": null,
+    "employment_type": [
+      "FULL_TIME"
+    ],
+    "url": "https://br.linkedin.com/jobs/view/graduate-data-engineer-at-joveo-ai-4406865667",
+    "source_type": "jobboard",
+    "source": "linkedin",
+    "source_domain": "br.linkedin.com",
+    "organization_logo": "https://media.licdn.com/dms/image/v2/D560BAQGZaEx4qwD7IA/company-logo_200_200/B56Z2GgtYDKwAI-/0/1776078215755/joveo_ai_logo?e=2147483647&v=beta&t=iJhwSY4nzWFp1W-agIAJsP5-1ummr0cPdOycH3J8a-w",
+    "cities_derived": [
+      "São Paulo"
+    ],
+    "counties_derived": [
+      "Região Metropolitana de São Paulo"
+    ],
+    "regions_derived": [
+      "São Paulo"
+    ],
+    "countries_derived": [
+      "Brazil"
+    ],
+    "locations_derived": [
+      "São Paulo, São Paulo, Brazil"
+    ],
+    "timezones_derived": [
+      "America/Sao_Paulo"
+    ],
+    "lats_derived": [
+      -23.5506507
+    ],
+    "lngs_derived": [
+      -46.6333824
+    ],
+    "remote_derived": true,
+    "linkedin_org_employees": 1,
+    "linkedin_org_url": "https://www.joveo.com",
+    "linkedin_org_size": "51-200 employees",
+    "linkedin_org_slogan": "AI-Led, High-Performance Recruitment Marketing Platform",
+    "linkedin_org_industry": "Software Development",
+    "linkedin_org_followers": null,
+    "linkedin_org_headquarters": "Menlo Park, California",
+    "linkedin_org_type": "Privately Held",
+    "linkedin_org_foundeddate": "",
+    "linkedin_org_specialties": [
+      "Recruitment",
+      "Talent Acquisition",
+      "Programmatic Job Advertising",
+      "Recruitment Marketing",
+      "HR Technology",
+      "Ad Tech",
+      "HR Tech",
+      "SaaS",
+      "Programmatic Recruitment Advertising",
+      "Job Advertising",
+      " Recruitment Advertising",
+      "Platform",
+      "Software",
+      "and ecruitment Analytics"
+    ],
+    "linkedin_org_locations": [
+      "Menlo Park, California, US"
+    ],
+    "linkedin_org_description": "As the global leader in AI-powered recruitment marketing and candidate engagement, we are transforming talent attraction and recruitment media buying for the world’s largest and smartest employers, staffing businesses, RPOs, and recruitment advertising agencies.\n\nThe Joveo platform enables businesses to attract, source, engage, and hire the most relevant candidates on time, within their budget. Powering millions of jobs every day, our data-driven recruitment marketing platform uses advanced data science and machine learning to dynamically manage and optimise talent sourcing and applications across all online channels while providing real-time insights at every step of the job seeker journey, from click to hire.\n\nFor more information, visit www.joveo.com.",
+    "linkedin_org_recruitment_agency_derived": false,
+    "seniority": "Não aplicável",
+    "directapply": true,
+    "linkedin_org_slug": "joveo-ai",
+    "no_jb_schema": null,
+    "external_apply_url": null,
+    "ats_duplicate": null,
+    "linkedin_id": 4406865667,
+    "description_text": "About Joveo:\nEvery company says they're \"AI-first.\" We actually are. Joveo's recruitment \nadvertising platform processes millions of hiring decisions through machine \nlearning, real-time bidding, and predictive analytics — helping the world's \nlargest employers find the right people, faster and fairer. But we're not \ndone. Not even close.\n\nRole: Graduate Data Engineer\nLocation: Remote\n\nRole Overview:\nWe are hiring a Graduate Data Engineer to launch your career building \nthe data infrastructure that powers Joveo's AI platform. You will \nwrite production data pipelines, learn modern data stack tools, and \ncontribute to systems that process millions of data points in real time.\n\nKey Responsibilities:\n- Build and maintain batch and real-time data pipelines under senior guidance\n- Write SQL and Python code for data transformation and ETL workflows\n- Learn cloud data platforms (BigQuery, Redshift, Snowflake) in production\n- Contribute to data quality monitoring and pipeline reliability work\n- Collaborate with data scientists and analysts to deliver clean, usable datasets\n- Grow your skills in data modeling, orchestration, and modern data engineering practices\n\nRequired Skills & Qualifications:\n- Recent graduate with a Bachelor's or Master's in Computer Science, Data Science, or related field\n- Working knowledge of Python and SQL for data manipulation\n- Understanding of database fundamentals and data modeling basics\n- Familiarity with any data pipeline tool, cloud platform, or big data technology is a plus\n- Strong analytical thinking and attention to data correctness\n- Curiosity about how data flows through real production systems\n\nEqual Opportunity Employer:\nJoveo is an equal opportunity employer. We are committed to building an \ninclusive workplace and welcome applications from all qualified individuals \nregardless of race, color, ethnicity, nationality, gender, gender identity \nor expression, sexual orientation, age, religion, disability, marital status, \nor any other characteristic protected by applicable law. All hiring decisions \nare made solely on the basis of qualifications, skills, and demonstrated \nability.\n\nIf your dream job is one that doesn't fit neatly into a job title — apply.\nJoveo. Where AI meets the future of work."
+  },
+  {
+    "id": "2124578775",
+    "date_posted": "2026-04-25T16:13:37.774",
+    "date_created": "2026-04-25T16:13:37.858338",
+    "title": "Senior Data Engineer",
+    "organization": "GeorgiaTEK Systems Inc.",
+    "organization_url": "https://www.linkedin.com/company/georgiatek-systems-inc",
+    "date_validthrough": null,
+    "locations_raw": [
+      {
+        "@type": "Place",
+        "address": {
+          "@type": "PostalAddress",
+          "addressRegion": "",
+          "addressCountry": "",
+          "addressLocality": "Brasil"
+        }
+      }
+    ],
+    "location_type": null,
+    "location_requirements_raw": null,
+    "salary_raw": null,
+    "employment_type": null,
+    "url": "https://br.linkedin.com/jobs/view/senior-data-engineer-at-georgiatek-systems-inc-4404182162",
+    "source_type": "jobboard",
+    "source": "linkedin",
+    "source_domain": "br.linkedin.com",
+    "organization_logo": "https://media.licdn.com/dms/image/v2/C4D0BAQFS2nOc7k3WRA/company-logo_100_100/company-logo_100_100/0/1645584193004/georgiatek_systems_inc_logo?e=2147483647&v=beta&t=_R3f-jZ6tBM-CFZtbkW610b4QeBXyrgwD4yILD49QI8",
+    "cities_derived": null,
+    "counties_derived": null,
+    "regions_derived": null,
+    "countries_derived": [
+      "Brazil"
+    ],
+    "locations_derived": [
+      "Brazil"
+    ],
+    "timezones_derived": [
+      "America/Cuiaba"
+    ],
+    "lats_derived": [
+      -10.3333333
+    ],
+    "lngs_derived": [
+      -53.2
+    ],
+    "remote_derived": false,
+    "linkedin_org_employees": 52,
+    "linkedin_org_url": "http://www.GeorgiaTEK.com",
+    "linkedin_org_size": "51-200 employees",
+    "linkedin_org_slogan": "GeorgiaTEK offers motivated, skilled, and professional IT  Splunk, Java, Azure, AWS, Cognos .net, ERP Oracle, SAP, JAVA,",
+    "linkedin_org_industry": "Information Technology & Services",
+    "linkedin_org_followers": 242742,
+    "linkedin_org_headquarters": "Edison, New Jersey",
+    "linkedin_org_type": "Privately Held",
+    "linkedin_org_foundeddate": "2010",
+    "linkedin_org_specialties": [
+      "Software Development",
+      "IT staffing",
+      "Cloud ",
+      "AWS",
+      "Azure",
+      "Social media",
+      "Employee benefits",
+      "Bitcoin",
+      "Java",
+      ".net",
+      "IOS",
+      "Android",
+      "Project",
+      "offshore",
+      "trade",
+      "Market",
+      "recruting",
+      "human capital",
+      "temp hire",
+      "contract",
+      "programming",
+      "data bricks",
+      "pega",
+      "and salesforce"
+    ],
+    "linkedin_org_locations": [
+      "347 Plainfield Ave, Suite 108, Edison, New Jersey 08817, US",
+      "18 A New Rosita Bazzaar, Kotagala, LK"
+    ],
+    "linkedin_org_description": "GeorgiaTEK is a premier IT consultancy firm. In partnership with leading companies, it optimizes the business value of IT by matching talented professionals with companies in need of services or technical expertise. GTEK services include Strategic consulting, IT staffing, process innovation, implementation, custom and package software deployment, network services, and training.",
+    "linkedin_org_recruitment_agency_derived": true,
+    "seniority": "Pleno-sênior",
+    "directapply": true,
+    "linkedin_org_slug": "georgiatek-systems-inc",
+    "no_jb_schema": true,
+    "external_apply_url": null,
+    "ats_duplicate": null,
+    "linkedin_id": 4404182162,
+    "description_text": "Title : Senior Developer Data Engineer \nLocation : Brazil ,Costa Rica and Mexico \n100 % Remote \nRole Summary\nWe are looking for a Developer Senior Developer Data Engineer to build and operate scalable data pipelines and curated datasets that enable Digital and Customer Experience Applications across a global FMCG enterprise You will work handson with Python PySpark Databricks and SQL contribute to modern engineering practices using Gitbased workflows and CICD and support end to end delivery through Azure DevOps\n\nKey Responsibilities\n• Design develop and optimize ETLELT pipelines using Databricks PySpark to ingest transform and serve data for digitalcustomer experience use cases\n• Build and maintain highquality performant SQL transformations and dimensionalcurated data layers for analytics and downstream consumption\n• Implement best practices for Databricks engineering notebooks vs repos modular code clusterjob configuration performance tuning and cost awareness\n• Use Python for data processing utilities validations orchestration helpers and reusable libraries\n• Manage source control using Git with enterprise workflows across GitHub Bitbucket enforce PR reviews branching strategies and coding standards\n• Build and maintain CICD pipelines using Azure DevOps automating testing packaging and deployment of data codeartifacts across environments\n• Ensure data quality and reliability through validations reconciliation checks monitoring and operational runbooks\n• Collaborate with productapp teams analysts and platform teams to translate requirements into scalable data products aligned to customer experience journeys\n• For Senior Developer lead modulelevel design mentor engineers drive standards for CICD and code quality and own delivery for critical pipelines\n\nPrimary Skills MustHave\n• Strong handson experience with\n• o Python\n• o PySpark\n• o Databricks jobs workflows clusters repos\n• o SQL advanced querying optimization\n• Strong experience with Git and repository platforms GitHub andor Bitbucket\n• Handson experience implementing CICD for data engineering workloads\n• Strong working experience with Azure DevOps Boards Repos Pipelines buildrelease workflows\n\nSecondary Skills Good-to-Have\n• Azure Data Factory ADF for orchestration ingestion and scheduling patterns\n• Power BI experience for consumptionlayer understanding datasets measures refresh patterns supporting analytics enablement"
+  },
+  {
+    "id": "2124578637",
+    "date_posted": "2026-04-25T16:13:34.661",
+    "date_created": "2026-04-25T16:13:34.840366",
+    "title": "Data Engineer",
+    "organization": "Coltech",
+    "organization_url": "https://www.linkedin.com/company/coltechglobal",
+    "date_validthrough": null,
+    "locations_raw": [
+      {
+        "@type": "Place",
+        "address": {
+          "@type": "PostalAddress",
+          "addressRegion": "",
+          "addressCountry": "",
+          "addressLocality": "Brasil"
+        }
+      }
+    ],
+    "location_type": null,
+    "location_requirements_raw": null,
+    "salary_raw": null,
+    "employment_type": null,
+    "url": "https://br.linkedin.com/jobs/view/data-engineer-at-coltech-4404166719",
+    "source_type": "jobboard",
+    "source": "linkedin",
+    "source_domain": "br.linkedin.com",
+    "organization_logo": "https://media.licdn.com/dms/image/v2/D4E0BAQFivlPos4UaOw/company-logo_100_100/company-logo_100_100/0/1666001564790/coltechglobal_logo?e=2147483647&v=beta&t=1SD33-FAVkrEUUaRlLfgQvg9blVbAg__Fbpi9-rYKF4",
+    "cities_derived": null,
+    "counties_derived": null,
+    "regions_derived": null,
+    "countries_derived": [
+      "Brazil"
+    ],
+    "locations_derived": [
+      "Brazil"
+    ],
+    "timezones_derived": [
+      "America/Cuiaba"
+    ],
+    "lats_derived": [
+      -10.3333333
+    ],
+    "lngs_derived": [
+      -53.2
+    ],
+    "remote_derived": false,
+    "linkedin_org_employees": 36,
+    "linkedin_org_url": "http://www.coltech.io",
+    "linkedin_org_size": "11-50 employees",
+    "linkedin_org_slogan": "Providing exceptional solutions to equally exceptional companies by providing capability not people 🚀",
+    "linkedin_org_industry": "IT Services and IT Consulting",
+    "linkedin_org_followers": null,
+    "linkedin_org_headquarters": "London",
+    "linkedin_org_type": "Privately Held",
+    "linkedin_org_foundeddate": "2019",
+    "linkedin_org_specialties": [
+      "Contractors",
+      "Consultancy",
+      "Project Delivery",
+      "Public Sector",
+      "Start-up Scaling",
+      "Software Engineering",
+      "Cloud",
+      "DevOps",
+      "JavaScript",
+      "Contracts",
+      "Technology",
+      "SDET",
+      "Python",
+      "SRE",
+      "Software",
+      "IT",
+      "London",
+      "Europe",
+      "Austin",
+      "USA",
+      "GCP",
+      "Google cloud",
+      "Google cloud platform",
+      "Kubernetes ",
+      "GoLang",
+      "cloud native",
+      "software Engineerign ",
+      "and Backend engineering"
+    ],
+    "linkedin_org_locations": [
+      "London, EC3N 2EX, GB",
+      "Keizersgracht 482, Amsterdam, 1017EG, NL",
+      "2021 Guadalupe St, Austin, Texas 78705, US"
+    ],
+    "linkedin_org_description": "Coltech | Cloud & Software Engineering Specialists\n\nColtech is a specialist solutions provider focused on delivering high-impact cloud and software engineering teams to businesses across Europe and the U.S. from our offices in London, Amsterdam, and Austin, Texas.\n\nOur Focus Areas:\n🚀 Cloud Engineering & DevOps – Expertise in GCP, Kubernetes, and Golang for scalable, cloud-native transformation.\n🔹 Software Engineering – High-performance backend teams supporting fintech, SaaS, and enterprise IT modernization.\n💡 Project-Based Solutions – Deploying agile squads to support digital transformation and cloud migration projects.\n\nOur Approach:\n\n⭐Vision\nTo become the go-to partner for delivering expert engineering teams that drive successful project outcomes.\n\n⭐Mission\nTo deliver high-quality, cost-effective engineering solutions by combining global talent with speed and agility.\n\n⭐Purpose\nTo empower businesses with exceptional talent while creating meaningful career opportunities for our people.\n\nOur Services:\n✅ Virtual Bench – Pre-vetted cloud & software engineers, ready to deploy.\n✅ Project Team Deployment – Agile squads for high-impact initiatives.\n✅ Full Outcome-Based Delivery – Managed teams aligned to client objectives.\n\nFor more information contact: \ninfo@coltech.io\nUK| (+44) 20 3307 6850\nEurope| (+31) 202 414 844\nUSA | (+1) 512 717 7490\nhttps://www.coltech.io",
+    "linkedin_org_recruitment_agency_derived": false,
+    "seniority": "Pleno-sênior",
+    "directapply": true,
+    "linkedin_org_slug": "coltechglobal",
+    "no_jb_schema": true,
+    "external_apply_url": null,
+    "ats_duplicate": null,
+    "linkedin_id": 4404166719,
+    "description_text": "Data Engineer – Microsoft Fabric (Contract)\nLocation: Remote (US-based client)\nDuration: 3-month initial contract (high likelihood of extension)\nStart Date: 27th April\nOverview\nWe’re supporting a leading pharmaceutical organisation on a major data platform transformation, focused on building out a Microsoft Fabric-based environment to drive analytics, reporting, and AI-led initiatives across the business.\nThey’re looking for a hands-on Data Engineer to support the build and optimisation of scalable data pipelines, enabling high-quality, trusted data for downstream use.\nKey Responsibilities\nDesign, build, and optimise data pipelines within a Microsoft Fabric / Azure-based environment\nSupport the development of a modern data platform (lakehouse / medallion architecture)\nIntegrate data from multiple sources into a centralised data platform\nDevelop and maintain data models to support analytics and reporting\nWork closely with stakeholders to gather requirements and deliver scalable solutions\nEnsure data quality, reliability, and performance across pipelines\nCollaborate with cross-functional teams across data, analytics, and engineering\nRequired Skills & Experience\n4+ years experience as a Data Engineer\nHands-on experience with Microsoft Fabric OR strong Azure data stack (Data Factory, Synapse, Databricks, ADLS, Power BI)\nStrong experience building ETL/ELT pipelines (Python, SQL, PySpark)\nExperience with data modelling (star schema / dimensional modelling)\nExperience working with large-scale data platforms / lakehouse architectures\nStrong understanding of pipeline performance and optimisation\nNice to Have\nExperience with Microsoft Purview / data governance / data cataloging\nExperience in pharma, healthcare, or regulated environments\nExposure to real-time / streaming pipelines\nExperience supporting AI / ML or analytics use cases\nWhat They’re Looking For\nHands-on, delivery-focused engineer\nComfortable in a fast-paced environment\nStrong communicator across technical and business teams\nExperience contributing to modern data platforms end-to-end"
+  },
+  {
+    "id": "2124562023",
+    "date_posted": "2026-04-25T13:25:06",
+    "date_created": "2026-04-25T16:05:34.774633",
+    "title": "Data Engineer (Remote)",
+    "organization": "Joveo AI",
+    "organization_url": "https://www.linkedin.com/company/joveo-ai",
+    "date_validthrough": "2026-05-25T13:25:06",
+    "locations_raw": [
+      {
+        "@type": "Place",
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "BR",
+          "addressLocality": "São Paulo",
+          "addressRegion": null,
+          "streetAddress": null
+        },
+        "latitude": -22.07027,
+        "longitude": -48.433388
+      }
+    ],
+    "location_type": "TELECOMMUTE",
+    "location_requirements_raw": [
+      {
+        "@type": "Country",
+        "name": "São Paulo, Brasil"
+      }
+    ],
+    "salary_raw": null,
+    "employment_type": [
+      "FULL_TIME"
+    ],
+    "url": "https://br.linkedin.com/jobs/view/data-engineer-remote-at-joveo-ai-4406866298",
+    "source_type": "jobboard",
+    "source": "linkedin",
+    "source_domain": "br.linkedin.com",
+    "organization_logo": "https://media.licdn.com/dms/image/v2/D560BAQGZaEx4qwD7IA/company-logo_200_200/B56Z2GgtYDKwAI-/0/1776078215755/joveo_ai_logo?e=2147483647&v=beta&t=iJhwSY4nzWFp1W-agIAJsP5-1ummr0cPdOycH3J8a-w",
+    "cities_derived": [
+      "São Paulo"
+    ],
+    "counties_derived": [
+      "Região Metropolitana de São Paulo"
+    ],
+    "regions_derived": [
+      "São Paulo"
+    ],
+    "countries_derived": [
+      "Brazil"
+    ],
+    "locations_derived": [
+      "São Paulo, São Paulo, Brazil"
+    ],
+    "timezones_derived": [
+      "America/Sao_Paulo"
+    ],
+    "lats_derived": [
+      -23.5506507
+    ],
+    "lngs_derived": [
+      -46.6333824
+    ],
+    "remote_derived": true,
+    "linkedin_org_employees": 1,
+    "linkedin_org_url": "https://www.joveo.com",
+    "linkedin_org_size": "51-200 employees",
+    "linkedin_org_slogan": "AI-Led, High-Performance Recruitment Marketing Platform",
+    "linkedin_org_industry": "Software Development",
+    "linkedin_org_followers": null,
+    "linkedin_org_headquarters": "Menlo Park, California",
+    "linkedin_org_type": "Privately Held",
+    "linkedin_org_foundeddate": "",
+    "linkedin_org_specialties": [
+      "Recruitment",
+      "Talent Acquisition",
+      "Programmatic Job Advertising",
+      "Recruitment Marketing",
+      "HR Technology",
+      "Ad Tech",
+      "HR Tech",
+      "SaaS",
+      "Programmatic Recruitment Advertising",
+      "Job Advertising",
+      " Recruitment Advertising",
+      "Platform",
+      "Software",
+      "and ecruitment Analytics"
+    ],
+    "linkedin_org_locations": [
+      "Menlo Park, California, US"
+    ],
+    "linkedin_org_description": "As the global leader in AI-powered recruitment marketing and candidate engagement, we are transforming talent attraction and recruitment media buying for the world’s largest and smartest employers, staffing businesses, RPOs, and recruitment advertising agencies.\n\nThe Joveo platform enables businesses to attract, source, engage, and hire the most relevant candidates on time, within their budget. Powering millions of jobs every day, our data-driven recruitment marketing platform uses advanced data science and machine learning to dynamically manage and optimise talent sourcing and applications across all online channels while providing real-time insights at every step of the job seeker journey, from click to hire.\n\nFor more information, visit www.joveo.com.",
+    "linkedin_org_recruitment_agency_derived": false,
+    "seniority": "Não aplicável",
+    "directapply": true,
+    "linkedin_org_slug": "joveo-ai",
+    "no_jb_schema": null,
+    "external_apply_url": null,
+    "ats_duplicate": null,
+    "linkedin_id": 4406866298,
+    "description_text": "About Joveo:\nEvery company says they're \"AI-first.\" We actually are. Joveo's recruitment \nadvertising platform processes millions of hiring decisions through machine \nlearning, real-time bidding, and predictive analytics — helping the world's \nlargest employers find the right people, faster and fairer. But we're not \ndone. Not even close.\n\nRole: Data Engineer\nLocation: Remote\n\nRole Overview:\nWe are hiring a Data Engineer to design, build, and maintain the data \ninfrastructure that fuels Joveo's machine learning models and business \nintelligence. You will work at the intersection of software engineering and \ndata — building pipelines that are reliable, scalable, and production-ready.\n\nKey Responsibilities:\n- Design and maintain scalable batch and real-time data pipelines\n- Build and manage data warehousing and lakehouse architectures\n- Ensure data quality, lineage, and observability across all pipelines\n- Collaborate with data scientists and analysts to provide clean, usable datasets\n- Optimize query performance and infrastructure costs on cloud platforms\n- Document data models, pipelines, and ingestion processes thoroughly\n\nRequired Skills & Qualifications:\n- Strong experience with Python or Scala for data pipeline development\n- Proficiency with pipeline orchestration tools (Airflow, Prefect, or similar)\n- Hands-on experience with cloud data platforms (BigQuery, Redshift, Snowflake)\n- Solid understanding of SQL and data modeling best practices\n- Experience with streaming frameworks (Kafka, Spark Streaming, or Flink)\n- Familiarity with dbt, data contracts, or modern data stack tooling\n\nEqual Opportunity Employer:\nJoveo is an equal opportunity employer. We are committed to building an \ninclusive workplace and welcome applications from all qualified individuals \nregardless of race, color, ethnicity, nationality, gender, gender identity \nor expression, sexual orientation, age, religion, disability, marital status, \nor any other characteristic protected by applicable law. All hiring decisions \nare made solely on the basis of qualifications, skills, and demonstrated \nability.\n\nIf your dream job is one that doesn't fit neatly into a job title — apply.\nJoveo. Where AI meets the future of work."
+  },
+  {
+    "id": "2124560216",
+    "date_posted": "2026-04-25T12:58:44",
+    "date_created": "2026-04-25T16:04:41.685554",
+    "title": "Data Solutions Engineer - Remoto",
+    "organization": "Radartec",
+    "organization_url": "https://www.linkedin.com/company/radartec",
+    "date_validthrough": "2026-05-25T12:58:44",
+    "locations_raw": [
+      {
+        "@type": "Place",
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "BR",
+          "addressLocality": "Belo Horizonte e Região",
+          "addressRegion": null,
+          "streetAddress": null
+        },
+        "latitude": -19.633701,
+        "longitude": -43.967625
+      }
+    ],
+    "location_type": null,
+    "location_requirements_raw": null,
+    "salary_raw": null,
+    "employment_type": [
+      "FULL_TIME"
+    ],
+    "url": "https://br.linkedin.com/jobs/view/data-solutions-engineer-remoto-at-radartec-4406869184",
+    "source_type": "jobboard",
+    "source": "linkedin",
+    "source_domain": "br.linkedin.com",
+    "organization_logo": "https://media.licdn.com/dms/image/v2/C4D0BAQFOy6dzb7ZxHQ/company-logo_200_200/company-logo_200_200/0/1631326999577?e=2147483647&v=beta&t=i93SexdrvR_pWkf6OH5Z7_qQSdZV5zwge6oNKoy-GbI",
+    "cities_derived": null,
+    "counties_derived": null,
+    "regions_derived": null,
+    "countries_derived": [
+      "Brazil"
+    ],
+    "locations_derived": [
+      "Brazil"
+    ],
+    "timezones_derived": [
+      "America/Cuiaba"
+    ],
+    "lats_derived": [
+      -10.3333333
+    ],
+    "lngs_derived": [
+      -53.2
+    ],
+    "remote_derived": false,
+    "linkedin_org_employees": 3,
+    "linkedin_org_url": "http://www.radartec.com.br",
+    "linkedin_org_size": "2-10 employees",
+    "linkedin_org_slogan": null,
+    "linkedin_org_industry": "Human Resources Services",
+    "linkedin_org_followers": 7545,
+    "linkedin_org_headquarters": "BH, MG",
+    "linkedin_org_type": "Privately Held",
+    "linkedin_org_foundeddate": "",
+    "linkedin_org_specialties": [
+      "Recrutamento Online",
+      "Vagas de TI",
+      "Recursos Humanos",
+      "and Tecnologia"
+    ],
+    "linkedin_org_locations": [
+      "Belo Horizonte - MG, BH, MG, BR"
+    ],
+    "linkedin_org_description": "A Radartec é uma empresa que atua com Recrutamento Online segmentado para profissionais de Tecnologia e para as empresas que estão em busca desses profissionais. Nosso objetivo é facilitar e promover o encontro do candidato com a empresa.\r\n\r\nEstamos em fase BETA, trabalhando muito, colhendo o máximo de Feedbacks e aprendendo com nossos usuários. \r\n\r\nNossos serviços são gratuitos para candidatos e empresas. \r\nSerá uma honra ter você com a gente.",
+    "linkedin_org_recruitment_agency_derived": true,
+    "seniority": "Pleno-sênior",
+    "directapply": false,
+    "linkedin_org_slug": "radartec",
+    "no_jb_schema": null,
+    "external_apply_url": null,
+    "ats_duplicate": null,
+    "linkedin_id": 4406869184,
+    "description_text": "Principais Responsabilidades\n\nDesenvolver pipelines de dados (ingestão, transformação e disponibilização)\n\nModelar dados para analytics e suporte à tomada de decisão\n\nIntegrar APIs e sistemas externos (ex: bancos, CRMs, plataformas SaaS)\n\nConstruir soluções orientadas a dados\n\nAplicar IA/LLMs quando fizer sentido (ex: RAG, agentes, automações)\n\nParticipar da definição de arquitetura de dados e soluções\n\nTrabalhar próximo ao negócio para entender problemas e propor soluções\n\nDesenvolver POCs e evoluir soluções até produção\n\nGarantir qualidade, performance e escalabilidade das soluções\n\n\n\nO Que Esperamos Que Você Tenha\n\nForte capacidade analítica e de resolução de problemas\n\nExperiência sólida com Python\n\nExperiência com manipulação e modelagem de dados\n\nConhecimento em SQL\n\nExperiência com integração de APIs REST\n\nExperiência prática construindo soluções de dados\n\nDisposição real para entender necessidades de clientes e negócios e encarar de frente com propostas e negociações de solução.\n\nMaturidade e senioridade para conduzir conversa com pessoas em posição de alta liderança das empresas.\n\nDesejáveis\n\nExperiência com arquitetura de dados (Data Lake, DW, pipelines)\n\nExperiência com cloud (AWS, GCP ou Azure)\n\nExperiência com LLMs e IA aplicada (OpenAI, RAG, etc.)\n\nConhecimento em engenharia de software (boas práticas, testes, versionamento)\n\nExperiência com ferramentas de orquestração (Airflow, Celery, etc.)\n\nExperiência com mensageria (Kafka, RabbitMQ, etc.)\n\nConhecimento em machine learning"
+  },
+  {
+    "id": "2125140097",
+    "date_posted": "2026-01-07T07:13:45",
+    "date_created": "2026-04-26T10:09:13.761959",
+    "title": "Data Engineer Talent Pool | Banco de Talentos - Engenheiro de Dados",
+    "organization": "Dadosfera",
+    "organization_url": "https://www.linkedin.com/company/dadosfera",
+    "date_validthrough": "2026-05-25T19:30:47",
+    "locations_raw": [
+      {
+        "@type": "Place",
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "BR",
+          "addressLocality": "Belo Horizonte",
+          "addressRegion": null,
+          "streetAddress": null
+        },
+        "latitude": -19.922731,
+        "longitude": -43.945095
+      }
+    ],
+    "location_type": "TELECOMMUTE",
+    "location_requirements_raw": [
+      {
+        "@type": "Country",
+        "name": "Belo Horizonte, Minas Gerais, Brasil"
+      }
+    ],
+    "salary_raw": null,
+    "employment_type": [
+      "CONTRACTOR"
+    ],
+    "url": "https://br.linkedin.com/jobs/view/data-engineer-talent-pool-banco-de-talentos-engenheiro-de-dados-at-dadosfera-4358413543",
+    "source_type": "jobboard",
+    "source": "linkedin",
+    "source_domain": "br.linkedin.com",
+    "organization_logo": "https://media.licdn.com/dms/image/v2/C4D0BAQGUyhoExb1PDQ/company-logo_200_200/company-logo_200_200/0/1669912270038/dadosfera_logo?e=2147483647&v=beta&t=isk1gc19tw4ouMaw4YcM_L9FrMb1tycCBXqaVRYT71E",
+    "cities_derived": [
+      "Belo Horizonte"
+    ],
+    "counties_derived": [
+      "Região Metropolitana de Belo Horizonte"
+    ],
+    "regions_derived": [
+      "Minas Gerais"
+    ],
+    "countries_derived": [
+      "Brazil"
+    ],
+    "locations_derived": [
+      "Belo Horizonte, Minas Gerais, Brazil"
+    ],
+    "timezones_derived": [
+      "America/Sao_Paulo"
+    ],
+    "lats_derived": [
+      -19.9227318
+    ],
+    "lngs_derived": [
+      -43.9450948
+    ],
+    "remote_derived": true,
+    "linkedin_org_employees": 54,
+    "linkedin_org_url": "https://www.dadosfera.ai",
+    "linkedin_org_size": "51-200 employees",
+    "linkedin_org_slogan": "Organize seus dados. Otimize suas decisões. Escale com IA",
+    "linkedin_org_industry": "Information Technology & Services",
+    "linkedin_org_followers": 23910,
+    "linkedin_org_headquarters": "Belo Horizonte, Minas Gerais",
+    "linkedin_org_type": "Privately Held",
+    "linkedin_org_foundeddate": "2018",
+    "linkedin_org_specialties": [
+      "datascience",
+      "dataengineering",
+      "it",
+      "cienciadedados",
+      "engenhariadedados",
+      "bi",
+      "businessintelligence",
+      "and bigdata"
+    ],
+    "linkedin_org_locations": [
+      "Rua Sergipe 1440, Belo Horizonte, Minas Gerais, 30130-174, 9º Andar (WeWork), Belo Horizonte, Minas Gerais 30130-171, BR"
+    ],
+    "linkedin_org_description": "A Dadosfera está transformando a forma como médias e grandes empresas lidam com dados, Inteligência Artificial e Analytics. Nossa plataforma entrega capacidades avançadas — antes restritas a grandes empresas de tecnologia — para organizações que precisam tomar decisões mais rápidas, seguras e orientadas ao negócio.\n\nAo democratizar o acesso a dados confiáveis e IA aplicada, ajudamos nossos clientes a acelerar oportunidades de crescimento por meio de Dashboards, Data Apps e análises acionáveis, com impacto direto em áreas como marketing, finanças e operações.\n\nNossa plataforma reduz significativamente o tempo e a complexidade envolvidos na gestão de dados e de nuvem, organizando todo o ciclo de vida dos dados — da coleta e integração à análise e interação — para que os times possam focar no que realmente importa: gerar valor para o negócio.",
+    "linkedin_org_recruitment_agency_derived": false,
+    "seniority": "Assistente",
+    "directapply": false,
+    "linkedin_org_slug": "dadosfera",
+    "no_jb_schema": null,
+    "external_apply_url": null,
+    "ats_duplicate": true,
+    "linkedin_id": 4358413543,
+    "description_text": "Company Overview\n\nDadosfera is transforming the data landscape with a platform that delivers advanced Data, AI, and Analytics capabilities—previously available only to tech giants like Meta, Amazon, Alphabet, and Microsoft—into the hands of small and medium-sized businesses. By democratizing access to these technologies, we empower our clients to accelerate business opportunities through AI-powered Data Apps.\n\nOur platform minimizes the time spent on cloud management and streamlines the entire data lifecycle—from collection and exploration to processing and interaction—allowing clients to focus on their business goals. Built on a high-growth SaaS model, Dadosfera offers tailored solutions that meet real business needs.\n\nWhat sets Dadosfera apart is our innovative focus on speed, scalability, and flexibility, combining big data storage with advanced analytics to drive strategic decision-making. Leveraging years of experience with data platform implementations on foreign public clouds, we now deliver a cost-effective, locally adapted solution tailored for both Brazilian and global markets. By blending deep expertise with localized infrastructure, Dadosfera provides a powerful, efficient tool that optimizes corporate data management and drives data-driven transformation.\n\nAbout The Job\n\nAt Dadosfera, we are constantly looking for Data Engineers who want to build scalable solutions, work with large volumes of data, and contribute to strategic projects involving Data Platforms, Cloud, and AI.\n\nEven if we do not have an open position at the moment, by joining our Talent Pool, your profile will remain available for future opportunities aligned with your experience, interests, and career stage.\n\nWhat We Expect From You\n\nWe are looking for professionals who:\n\nAre passionate about data, technology, and solving complex problems;\nEnjoy working in dynamic, collaborative, and high-learning environments;\nHave a strong sense of responsibility, autonomy, and an ownership mindset;\nValue engineering best practices and continuous improvement.\n\nTechnical Requirements (may Vary Depending On The Role)\n\nDegree in a STEM field or equivalent professional experience;\nExperience with SQL and Python for data ingestion, transformation, and analysis;\nExperience with Linux environments and cloud platforms;\nKnowledge of data orchestration tools (Airflow, NiFi) and CDC solutions (Debezium, DMS);\nExperience with Kubernetes and Apache Spark;\nAbility to develop and consume APIs, as well as create scripts and automations;\nStrong organization and prioritization skills to handle multiple demands effectively.Diferenciais que valorizamos\n\nPreferred Qualifications\n\nExperience with modern data architectures;\nExperience in platform migration or modernization projects;\nKnowledge of DataOps, MLOps, or AI-driven solutions;\nExperience with BI tools or Data Apps;\nIntermediate or advanced English proficiency.\n\nAt Dadosfera, we celebrate diversity in all its forms and are committed to fostering an inclusive environment every day. We have zero tolerance for any form of discrimination.\n\nIf you share these values, don’t wait — apply today!"
+  }
+]

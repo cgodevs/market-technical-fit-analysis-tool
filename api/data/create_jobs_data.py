@@ -132,7 +132,7 @@ def build_seniority_df(chat_model, df: pd.DataFrame, concurrency: int = 10) -> p
 COLUMNS_SELECTION = ["id", "date_posted", "date_created", "title", "description_text", "seniority", "url", "countries_derived", "locations_derived", "organization", "organization_logo", "linkedin_org_url"]
 
 with open("./api/data/linkedin_api.json") as f:
-    data = json.load(f)[:2] #todo remove   
+    data = json.load(f)
     df = pd.DataFrame(data)
     selected_columns_df = df[COLUMNS_SELECTION] 
 
