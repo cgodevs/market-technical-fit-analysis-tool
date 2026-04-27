@@ -6,6 +6,7 @@ import psycopg2
 import pandas as pd
 from datetime import datetime
 from typing import List, Optional
+from multiprocessing.pool import ThreadPool
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pydantic import BaseModel, Field
 from pgvector.psycopg2 import register_vector
@@ -13,8 +14,6 @@ from google import genai
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.chat_models import init_chat_model
 
-EMAIL_EXAMPLE = "caroline.development@gmail.com"
-RESUME_UPLOAD_ID = '1'
 PATH_EXAMPLE_CV = "./api/data/cv_example.pdf"
 
 EMBEDDING_MODEL = "gemini-embedding-001"
@@ -23,9 +22,6 @@ LLM_PROVIDER = "google_genai"
 LLM_TEMPERATURE = 0.5
 EMBED_BATCH_SIZE = 100
 EMBED_CONCURRENCY = 5
-SENIORITY_CONCURRENCY = 10
-INDUSTRY_CONCURRENCY = 8
-TOP_INDUSTRIES = 3
 EMBED_MAX_RETRIES = 3
 
 DB_NAME = "market_fit"
@@ -136,11 +132,23 @@ def embed_texts(
 
     return [emb for batch in results for emb in batch]
 
+def recreate_df_with_embeddings(client: genai.Client, df: pd.DataFrame, column_to_embed: str, batch_size: int = 100, concurrency: int = 5) -> pd.DataFrame:
+    result_df = df.copy()
+    skills = result_df[column_to_embed].tolist()
+    batches = [skills[i:i + batch_size] for i in range(0, len(skills), batch_size)]
+
+    with ThreadPool(concurrency) as pool:
+        batch_results = pool.map(lambda batch: _embed_batch_with_retry(client, batch), batches)
+
+    embeddings = [emb for batch in batch_results for emb in batch]
+    result_df["embedding"] = embeddings
+    return result_df
+
 def save_obj_to_table(df: pd.DataFrame, table_name: str):
     pass
 
 
-# TODO: Update vars for testing
+# Update vars for testing
 EMAIL_EXAMPLE = "caroline.development@gmail.com"
 RESUME_UPLOAD_ID = '1'
 
@@ -164,29 +172,30 @@ hard_skills_obj = {
     "user_id": EMAIL_EXAMPLE,
     "upload_id": RESUME_UPLOAD_ID,
     "upload_date": upload_date,
-    "hard_skills": extraction_obj["hard_skills"]
+    "description": extraction_obj["hard_skills"]
 }
 
 soft_skills_obj = {
     "user_id": EMAIL_EXAMPLE,
     "upload_id": RESUME_UPLOAD_ID,
     "upload_date": upload_date,
-    "soft_skills": extraction_obj["soft_skills"]
+    "description": extraction_obj["soft_skills"]
 }
 
 cv_df = pd.DataFrame([cv_obj])
-hard_skills_df = pd.json_normalize(hard_skills_obj, record_path="hard_skills", meta=["user_id", "upload_id", "upload_date"])
-soft_skills_df = pd.json_normalize(soft_skills_obj, record_path="soft_skills", meta=["user_id", "upload_id", "upload_date"])
+hard_skills_df = pd.json_normalize(hard_skills_obj, record_path="description", meta=["user_id", "upload_id", "upload_date"])
+soft_skills_df = pd.json_normalize(soft_skills_obj, record_path="description", meta=["user_id", "upload_id", "upload_date"])
 
 hard_skills_df["upload_date"] = pd.to_datetime(hard_skills_df["upload_date"], format="%Y-%m-%d %H:%M:%S")
 soft_skills_df["upload_date"] = pd.to_datetime(soft_skills_df["upload_date"], format="%Y-%m-%d %H:%M:%S")
+
+hard_skills_df = recreate_df_with_embeddings(client, hard_skills_df, "description")
+soft_skills_df = recreate_df_with_embeddings(client, soft_skills_df, "description")
 
 save_obj_to_table(df=cv_df, table_name=RESUMES_TABLE)
 save_obj_to_table(df=hard_skills_df, table_name=CANDIDATE_HARD_SKILLS_TABLE)
 save_obj_to_table(df=soft_skills_df, table_name=CANDIDATE_SOFT_SKILLS_TABLE)
 
-print()
-# TODO: Embed all skills
 # TODO: Create database table for resumes (same columns as the jobs_positions)
 # TODO: Create database tables for soft skills extracted from resumes and hard skills too (same columns as the equivalent skills extracted from job descriptions)
 
