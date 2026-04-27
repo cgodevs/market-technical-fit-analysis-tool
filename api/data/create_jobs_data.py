@@ -168,7 +168,8 @@ def top_k_industries(
     sims = cosine_similarity_matrix(vec, industry_matrix)
     top_idx = np.argpartition(sims, -k)[-k:]
     top_idx = top_idx[np.argsort(sims[top_idx])[::-1]]
-    return industry_titles[top_idx].tolist()
+    upper_cased = [industry_titles[i].upper() for i in top_idx]
+    return upper_cased
 
 
 def assign_industries(
