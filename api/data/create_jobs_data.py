@@ -19,6 +19,7 @@ from typing import Optional
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import psycopg2
+import psycopg2.extras
 import numpy as np
 import pandas as pd
 from pydantic import BaseModel, Field
@@ -37,12 +38,19 @@ LLM_TEMPERATURE = 0.5
 
 DB_HOST = "localhost"
 DB_NAME = "market_fit"
-DB_USER = getenv("DB_USER")
-DB_PASSWORD = getenv("DB_PASSWORD")
-GEMINI_API_KEY = getenv("GEMINI_API_KEY")
+db_user = getenv("DB_USER")
+db_pw = getenv("DB_PASSWORD")
+api_key = getenv("GEMINI_API_KEY")
 
 JOB_POSTINGS_TABLE = "job_postings"
 SOURCE_FILE = "./api/data/linkedin_api.json"
+
+EMBED_BATCH_SIZE = 100
+EMBED_CONCURRENCY = 5
+SENIORITY_CONCURRENCY = 10
+INDUSTRY_CONCURRENCY = 8
+TOP_INDUSTRIES = 3
+EMBED_MAX_RETRIES = 3
 
 COLUMNS_TO_KEEP = [
     "id", "date_posted", "date_created", "title", "description_text",
@@ -71,12 +79,6 @@ SENIORITY_LEVELS = (
     "C-Level", "Partner", "Owner", "Founder",
 )
 
-EMBED_BATCH_SIZE = 100
-EMBED_CONCURRENCY = 5
-SENIORITY_CONCURRENCY = 10
-INDUSTRY_CONCURRENCY = 8
-TOP_INDUSTRIES = 3
-EMBED_MAX_RETRIES = 3
 
 # ---------------------------------------------------------------------------
 # Schemas
@@ -131,6 +133,19 @@ def embed_texts(
             results[futures[future]] = future.result()
 
     return [emb for batch in results for emb in batch]
+
+
+def update_job_postings_table_with_embeddings(df: pd.DataFrame) -> None:
+    with db_connect() as conn:
+        with conn.cursor() as cur:
+            for _, row in df.iterrows():
+                cur.execute(f"""
+                    UPDATE {JOB_POSTINGS_TABLE}
+                    SET title_embedding = %s
+                    WHERE id = %s
+                """, (row["title_embedding"], row["id"]))
+            conn.commit()
+
 
 # ---------------------------------------------------------------------------
 # Industry matching
@@ -246,7 +261,7 @@ def extract_seniority_bulk(
 
 def db_connect() -> psycopg2.extensions.connection:
     return psycopg2.connect(
-        host=DB_HOST, dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD
+        host=DB_HOST, dbname=DB_NAME, user=db_user, password=db_pw
     )
 
 
@@ -269,7 +284,7 @@ def bulk_insert_jobs(conn, df: pd.DataFrame, table: str = JOB_POSTINGS_TABLE) ->
         "id", "date_posted", "date_created", "title", "description", "url",
         "country", "location", "organization", "organization_logo",
         "linkedin_org_url", "weight", "c_source", "f_ai_min_seniority",
-        "ai_experience_time_months", "ai_industries",
+        "ai_experience_time_months", "ai_industries", "title_embedding"
     ]
     records = [tuple(row[c] for c in columns) for _, row in df[columns].iterrows()]
 
@@ -335,6 +350,9 @@ def enrich(df: pd.DataFrame, gemini_client: genai.Client, chat_model) -> pd.Data
     df = df.merge(seniority_df, left_on="id", right_on="job_id", how="left", suffixes=("_old", ""))
     df = df.drop(columns=["job_id", "f_ai_min_seniority_old", "ai_experience_time_months_old"])
 
+    # --- Title embeddings via Gemini ---
+    df["title_embedding"] = embed_texts(gemini_client, df["title"].tolist())
+
     return df
 
 
@@ -352,7 +370,7 @@ def main() -> None:
         model=MODEL_NAME,
         model_provider=LLM_PROVIDER,
         temperature=LLM_TEMPERATURE,
-        api_key=GEMINI_API_KEY,
+        api_key=api_key,
     )
     print("Loading data...")
     raw_df = load(SOURCE_FILE)
@@ -364,7 +382,7 @@ def main() -> None:
     transformed_df = transform(filtered_df)
 
     print("Enriching (embeddings + seniority LLM)...")
-    gemini_client = genai.Client(api_key=GEMINI_API_KEY)
+    gemini_client = genai.Client(api_key=api_key)
     enriched_df = enrich(transformed_df, gemini_client, chat_model)
 
     print("Saving to database...")
