@@ -2,14 +2,14 @@ import os
 import re
 import time
 import pymupdf4llm
-import psycopg2
 import pandas as pd
+import psycopg2
+from psycopg2.extras import execute_values
 from datetime import datetime
 from typing import List, Optional
 from multiprocessing.pool import ThreadPool
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pydantic import BaseModel, Field
-from pgvector.psycopg2 import register_vector
 from google import genai
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.chat_models import init_chat_model
@@ -59,13 +59,6 @@ class ProfessionalProfile(BaseModel):
     hard_skills: List[HardSkill]
     soft_skills: List[SoftSkill]
 
-
-def db_connect() -> psycopg2.extensions.connection:
-    conn = psycopg2.connect(
-        host=DB_HOST, dbname=DB_NAME, user=db_user, password=db_pw
-    )
-    register_vector(conn)
-    return conn
 
 def get_list_of_industries_from_local_file() -> List[str]:
     with open("./api/data/enum_industry.txt", "r") as f:
@@ -144,8 +137,30 @@ def recreate_df_with_embeddings(client: genai.Client, df: pd.DataFrame, column_t
     result_df["embedding"] = embeddings
     return result_df
 
-def save_obj_to_table(df: pd.DataFrame, table_name: str):
-    pass
+def save_df_to_database(df: pd.DataFrame, table_name: str) -> int:
+    cols = ", ".join(df.columns)
+    placeholders = ", ".join(
+        "%s::vector" if "embedding" in col else "%s"
+        for col in df.columns
+    )
+    template = f"({placeholders})"
+
+    with psycopg2.connect(
+        host=DB_HOST, database=DB_NAME, user=db_user, password=db_pw
+    ) as conn:
+        conn.autocommit = False
+        cur = conn.cursor()
+        execute_values(
+            cur,
+            f"INSERT INTO {table_name} ({cols}) VALUES %s",
+            [tuple(row) for _, row in df.iterrows()],
+            template=template,
+            page_size=500
+        )
+        ids = [row[0] for row in cur.fetchall()]
+        conn.commit()
+        return ids[0]
+
 
 
 # Update vars for testing
@@ -155,7 +170,7 @@ RESUME_UPLOAD_ID = '1'
 client = genai.Client(api_key=api_key)
 
 cv_md_text = pymupdf4llm.to_markdown(PATH_EXAMPLE_CV)
-extraction_obj = extract_professional_structured_data(cv_md_text)
+profile_obj = extract_professional_structured_data(cv_md_text)
 upload_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 cv_obj = {
@@ -163,41 +178,40 @@ cv_obj = {
     "upload_id": RESUME_UPLOAD_ID,
     "upload_date": upload_date,
     "description": cv_md_text,
-    "industries": extraction_obj["industries"],
-    "position": extraction_obj["position"]["name"],
-    "position_embedding": embed_texts(client, [extraction_obj["position"]["name"]])[0]
+    "industries": profile_obj["industries"],
+    "position": profile_obj["position"]["name"],
+    "time_experience_months": profile_obj["position"]["time_experience"],
+    "position_embedding": embed_texts(client, [profile_obj["position"]["name"]])[0]
 }
 
 hard_skills_obj = {
-    "user_id": EMAIL_EXAMPLE,
-    "upload_id": RESUME_UPLOAD_ID,
-    "upload_date": upload_date,
-    "description": extraction_obj["hard_skills"]
+    "resume_id": RESUME_UPLOAD_ID,
+    "weight": [skill["weight"] for skill in profile_obj["hard_skills"]],
+    "description": [skill["description"] for skill in profile_obj["hard_skills"]],
+    "time_experience_months": [skill["time_experience"] for skill in profile_obj["hard_skills"]]
 }
 
 soft_skills_obj = {
-    "user_id": EMAIL_EXAMPLE,
-    "upload_id": RESUME_UPLOAD_ID,
-    "upload_date": upload_date,
-    "description": extraction_obj["soft_skills"]
+    "resume_id": RESUME_UPLOAD_ID,
+    "weight": [skill["weight"] for skill in profile_obj["soft_skills"]],
+    "description": [skill["description"] for skill in profile_obj["soft_skills"]]
 }
 
-cv_df = pd.DataFrame([cv_obj])
-hard_skills_df = pd.json_normalize(hard_skills_obj, record_path="description", meta=["user_id", "upload_id", "upload_date"])
-soft_skills_df = pd.json_normalize(soft_skills_obj, record_path="description", meta=["user_id", "upload_id", "upload_date"])
 
-hard_skills_df["upload_date"] = pd.to_datetime(hard_skills_df["upload_date"], format="%Y-%m-%d %H:%M:%S")
-soft_skills_df["upload_date"] = pd.to_datetime(soft_skills_df["upload_date"], format="%Y-%m-%d %H:%M:%S")
+cv_df = pd.DataFrame([cv_obj])
+hard_skills_df = pd.DataFrame(profile_obj["hard_skills"])
+soft_skills_df = pd.DataFrame(profile_obj["soft_skills"])
 
 hard_skills_df = recreate_df_with_embeddings(client, hard_skills_df, "description")
 soft_skills_df = recreate_df_with_embeddings(client, soft_skills_df, "description")
 
-save_obj_to_table(df=cv_df, table_name=RESUMES_TABLE)
-save_obj_to_table(df=hard_skills_df, table_name=CANDIDATE_HARD_SKILLS_TABLE)
-save_obj_to_table(df=soft_skills_df, table_name=CANDIDATE_SOFT_SKILLS_TABLE)
+# resume_id = save_df_to_database(df=cv_df, table_name=RESUMES_TABLE)
+# hard_skills_obj["id"] = resume_id
+# soft_skills_obj["id"] = resume_id
 
-# TODO: Create database table for resumes (same columns as the jobs_positions)
-# TODO: Create database tables for soft skills extracted from resumes and hard skills too (same columns as the equivalent skills extracted from job descriptions)
+# save_df_to_database(df=hard_skills_df, table_name=CANDIDATE_HARD_SKILLS_TABLE)
+# save_df_to_database(df=soft_skills_df, table_name=CANDIDATE_SOFT_SKILLS_TABLE)
 
+# TODO: Recreate database tables for soft skills extracted from resumes and hard skills too (same columns as the equivalent skills extracted from job descriptions)
 # TODO: Filter database by industries
 # TODO: For each job, use positions embeddings for the title to calculate similarity with positions_embeddings to find the best matching positions to bring up for analysis and its time experience.

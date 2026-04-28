@@ -61,3 +61,31 @@ CREATE TABLE work_industries (
     title           VARCHAR(255) NOT NULL,
     embedding       VECTOR(3072)
 );
+
+CREATE TABLE resumes (
+    id                      VARCHAR(255) PRIMARY KEY,
+	user_id					VARCHAR(255),
+	upload_id				VARCHAR(255),
+	upload_date				TIMESTAMP,
+	description				TEXT,
+	industries				VARCHAR(255)[],
+	position				VARCHAR(255),
+	time_experience_months	SMALLINT,	
+	position_embedding		VECTOR(3072)
+);
+
+CREATE TABLE candidate_hard_skills (
+    id          SERIAL PRIMARY KEY,
+    resume_id   VARCHAR(255) NOT NULL REFERENCES resumes(id) ON DELETE CASCADE,
+	description TEXT,
+    weight      FLOAT,
+    embedding   VECTOR(3072)  
+);
+
+CREATE TABLE candidate_soft_skills (
+    id          SERIAL PRIMARY KEY,
+    resume_id   VARCHAR(255) NOT NULL REFERENCES resumes(id) ON DELETE CASCADE,
+	description TEXT,
+    weight      FLOAT,
+    embedding   VECTOR(3072)  
+);
