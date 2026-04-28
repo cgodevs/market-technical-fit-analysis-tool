@@ -50,7 +50,7 @@ def build_embeddings(client: genai.Client, df: pd.DataFrame, column_to_embed: st
     return result_df
 
 def get_list_of_industries_from_local_file() -> List[str]:
-    with open("./api/data/enum_industry.txt", "r") as f:
+    with open("./data/enum_industry.txt", "r") as f:
         industries = [line.strip() for line in f if line.strip()]
     return industries
 

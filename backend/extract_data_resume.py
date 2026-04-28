@@ -15,7 +15,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain.chat_models import init_chat_model
 import uuid
 
-PATH_EXAMPLE_CV = "./api/data/cv_example.pdf"
+PATH_EXAMPLE_CV = "./data/cv_example.pdf"
 
 EMBEDDING_MODEL = "gemini-embedding-001"
 LLM_MODEL_NAME = "gemini-2.5-flash-lite"
@@ -62,7 +62,7 @@ class ProfessionalProfile(BaseModel):
 
 
 def get_list_of_industries_from_local_file() -> List[str]:
-    with open("./api/data/enum_industry.txt", "r") as f:
+    with open("./data/enum_industry.txt", "r") as f:
         industries = [line.strip() for line in f if line.strip()]
         industries = [industry.upper() for industry in industries] 
     return industries
@@ -200,7 +200,3 @@ soft_skills_df = soft_skills_df[["resume_id", "description", "weight", "embeddin
 save_df_to_database(df=cv_df, table_name=RESUMES_TABLE)
 save_df_to_database(df=hard_skills_df, table_name=CANDIDATE_HARD_SKILLS_TABLE)
 save_df_to_database(df=soft_skills_df, table_name=CANDIDATE_SOFT_SKILLS_TABLE)
-
-# TODO: Clean database
-# TODO: Filter database by industries
-# TODO: For each job, use positions embeddings for the title to calculate similarity with positions_embeddings to find the best matching positions to bring up for analysis and its time experience.

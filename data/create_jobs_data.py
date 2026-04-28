@@ -43,7 +43,7 @@ db_pw = getenv("DB_PASSWORD")
 api_key = getenv("GEMINI_API_KEY")
 
 JOB_POSTINGS_TABLE = "job_postings"
-SOURCE_FILE = "./api/data/linkedin_api.json"
+SOURCE_FILE = "./data/linkedin_api.json"
 
 EMBED_BATCH_SIZE = 100
 EMBED_CONCURRENCY = 5

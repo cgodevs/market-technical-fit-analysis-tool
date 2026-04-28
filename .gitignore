@@ -45,3 +45,5 @@ yarn-error.log*
 *.tsbuildinfo
 /front/next-env.d.ts
 next-env.d.ts
+
+/.vscode
