@@ -13,6 +13,7 @@ from pydantic import BaseModel, Field
 from google import genai
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.chat_models import init_chat_model
+import uuid
 
 PATH_EXAMPLE_CV = "./api/data/cv_example.pdf"
 
@@ -41,7 +42,7 @@ SENIORITY_LEVELS = (
 
 class HardSkill(BaseModel):
     description: str = Field(description="Objective description of the hard skill or experience in English.")
-    time_experience: Optional[float] = Field(description="Experience in months, if explicitly stated.")
+    time_experience_months: Optional[float] = Field(description="Experience in months, if explicitly stated.")
     weight: Optional[float] = Field(description="Relevance experience score 0–1 for this position.")
 
 class SoftSkill(BaseModel):
@@ -50,7 +51,7 @@ class SoftSkill(BaseModel):
 
 class Position(BaseModel):
     name: str = Field(description="Name of the goal position or most experienced position")
-    time_experience: Optional[float] = Field(description="Time experience in months identified for the held position.")
+    time_experience_months: Optional[float] = Field(description="Time experience in months identified for the held position.")
 
 class ProfessionalProfile(BaseModel):
     industries: List[str] = Field(description="Maximum of 3 matching LinkedIn industries list for the current goal job. Must be chosen from the list provided.")
@@ -157,15 +158,13 @@ def save_df_to_database(df: pd.DataFrame, table_name: str) -> int:
             template=template,
             page_size=500
         )
-        ids = [row[0] for row in cur.fetchall()]
         conn.commit()
-        return ids[0]
 
 
 
 # Update vars for testing
 EMAIL_EXAMPLE = "caroline.development@gmail.com"
-RESUME_UPLOAD_ID = '1'
+resume_upload_id = str(uuid.uuid4())
 
 client = genai.Client(api_key=api_key)
 
@@ -174,29 +173,16 @@ profile_obj = extract_professional_structured_data(cv_md_text)
 upload_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 cv_obj = {
+    "id": resume_upload_id,
     "user_id": EMAIL_EXAMPLE,
-    "upload_id": RESUME_UPLOAD_ID,
+    "upload_id": resume_upload_id,
     "upload_date": upload_date,
     "description": cv_md_text,
     "industries": profile_obj["industries"],
     "position": profile_obj["position"]["name"],
-    "time_experience_months": profile_obj["position"]["time_experience"],
+    "time_experience_months": profile_obj["position"]["time_experience_months"],
     "position_embedding": embed_texts(client, [profile_obj["position"]["name"]])[0]
 }
-
-hard_skills_obj = {
-    "resume_id": RESUME_UPLOAD_ID,
-    "weight": [skill["weight"] for skill in profile_obj["hard_skills"]],
-    "description": [skill["description"] for skill in profile_obj["hard_skills"]],
-    "time_experience_months": [skill["time_experience"] for skill in profile_obj["hard_skills"]]
-}
-
-soft_skills_obj = {
-    "resume_id": RESUME_UPLOAD_ID,
-    "weight": [skill["weight"] for skill in profile_obj["soft_skills"]],
-    "description": [skill["description"] for skill in profile_obj["soft_skills"]]
-}
-
 
 cv_df = pd.DataFrame([cv_obj])
 hard_skills_df = pd.DataFrame(profile_obj["hard_skills"])
@@ -205,13 +191,16 @@ soft_skills_df = pd.DataFrame(profile_obj["soft_skills"])
 hard_skills_df = recreate_df_with_embeddings(client, hard_skills_df, "description")
 soft_skills_df = recreate_df_with_embeddings(client, soft_skills_df, "description")
 
-# resume_id = save_df_to_database(df=cv_df, table_name=RESUMES_TABLE)
-# hard_skills_obj["id"] = resume_id
-# soft_skills_obj["id"] = resume_id
+hard_skills_df["resume_id"] = resume_upload_id
+soft_skills_df["resume_id"] = resume_upload_id
 
-# save_df_to_database(df=hard_skills_df, table_name=CANDIDATE_HARD_SKILLS_TABLE)
-# save_df_to_database(df=soft_skills_df, table_name=CANDIDATE_SOFT_SKILLS_TABLE)
+hard_skills_df = hard_skills_df[["resume_id", "description", "weight", "time_experience_months", "embedding"]]
+soft_skills_df = soft_skills_df[["resume_id", "description", "weight", "embedding"]]
 
-# TODO: Recreate database tables for soft skills extracted from resumes and hard skills too (same columns as the equivalent skills extracted from job descriptions)
+save_df_to_database(df=cv_df, table_name=RESUMES_TABLE)
+save_df_to_database(df=hard_skills_df, table_name=CANDIDATE_HARD_SKILLS_TABLE)
+save_df_to_database(df=soft_skills_df, table_name=CANDIDATE_SOFT_SKILLS_TABLE)
+
+# TODO: Clean database
 # TODO: Filter database by industries
 # TODO: For each job, use positions embeddings for the title to calculate similarity with positions_embeddings to find the best matching positions to bring up for analysis and its time experience.

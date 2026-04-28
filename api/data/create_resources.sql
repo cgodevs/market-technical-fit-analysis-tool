@@ -79,6 +79,7 @@ CREATE TABLE candidate_hard_skills (
     resume_id   VARCHAR(255) NOT NULL REFERENCES resumes(id) ON DELETE CASCADE,
 	description TEXT,
     weight      FLOAT,
+	time_experience_months SMALLINT,
     embedding   VECTOR(3072)  
 );
 
