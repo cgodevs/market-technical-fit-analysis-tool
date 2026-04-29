@@ -30,7 +30,7 @@ CREATE TABLE job_postings (
     c_source                VARCHAR(100),
     f_ai_min_seniority      VARCHAR(50),
     ai_experience_time_months   SMALLINT,
-    ai_industries               VARCHAR(255)[]
+    ai_industries               TEXT[]
 );
 
 -- Indexes for common query patterns
@@ -68,7 +68,7 @@ CREATE TABLE resumes (
 	upload_id				VARCHAR(255),
 	upload_date				TIMESTAMP,
 	description				TEXT,
-	industries				VARCHAR(255)[],
+	industries				TEXT[],
 	position				VARCHAR(255),
 	time_experience_months	SMALLINT,	
 	position_embedding		VECTOR(3072)
