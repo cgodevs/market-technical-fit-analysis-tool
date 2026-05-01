@@ -54,7 +54,7 @@ class Position(BaseModel):
     time_experience_months: Optional[float] = Field(description="Time experience in months identified for the held position.")
 
 class ProfessionalProfile(BaseModel):
-    industries: List[str] = Field(description="Maximum of 3 matching LinkedIn industries list for the current goal job. Must be chosen from the list provided.")
+    industries: List[str] = Field(description="Maximum of 2 matching LinkedIn industries list for the current goal job title, not the experience. Must be chosen from the list provided.")
     seniority: str = Field(description=f"Seniority level identifified for main goal position. Must be one of: {', '.join(SENIORITY_LEVELS)}.")
     position: Position
     hard_skills: List[HardSkill]
