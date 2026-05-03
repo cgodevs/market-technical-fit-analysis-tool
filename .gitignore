@@ -48,3 +48,4 @@ next-env.d.ts
 
 /.vscode
 /backend/__pycache__/
+__pycache__
