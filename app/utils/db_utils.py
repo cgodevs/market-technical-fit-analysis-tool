@@ -1,5 +1,5 @@
 from typing import List
-from ..config import RESUMES_TABLE, CANDIDATE_HARD_SKILLS_TABLE, CANDIDATE_SOFT_SKILLS_TABLE
+from config import RESUMES_TABLE, CANDIDATE_HARD_SKILLS_TABLE, CANDIDATE_SOFT_SKILLS_TABLE
 from psycopg2.extras import execute_values
 from psycopg2.extensions import connection as PsycopgConnection
 import pandas as pd
@@ -39,8 +39,11 @@ def save_resume_data(
     """Insert resume + skills atomically — all succeed or all roll back."""
     try:
         _insert_df(conn, cv_df, RESUMES_TABLE)
+        print(f"Inserted to {RESUMES_TABLE}")
         _insert_df(conn, hard_skills_df, CANDIDATE_HARD_SKILLS_TABLE)
+        print(f"Inserted to {CANDIDATE_HARD_SKILLS_TABLE}")
         _insert_df(conn, soft_skills_df, CANDIDATE_SOFT_SKILLS_TABLE)
+        print(f"Inserted to {CANDIDATE_SOFT_SKILLS_TABLE}")
         conn.commit()
     except Exception:
         conn.rollback()

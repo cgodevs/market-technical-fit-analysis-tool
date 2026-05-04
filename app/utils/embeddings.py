@@ -1,5 +1,5 @@
-from app.exceptions import EmbeddingError
-from ..config import EMBED_BATCH_SIZE, EMBED_CONCURRENCY, EMBED_MAX_RETRIES, EMBEDDING_MODEL, api_key
+from exceptions import EmbeddingError
+from config import EMBED_BATCH_SIZE, EMBED_CONCURRENCY, EMBED_MAX_RETRIES, EMBEDDING_MODEL, api_key
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from multiprocessing.pool import ThreadPool
 from time import sleep

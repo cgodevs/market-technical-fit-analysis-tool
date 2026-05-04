@@ -7,18 +7,18 @@ from fastapi import UploadFile
 from langchain_core.prompts import ChatPromptTemplate
 from google import genai
 from random import randint
-from app.exceptions import ResumeParsingError, ResumeNotFoundError, StructuredOutputParsingError, ResumeProcessingError
-from app.database.manager import DatabaseManager
-from app.models.profiles import ProfessionalProfile
-from app.config import api_key, LLM_MODEL_NAME, LLM_PROVIDER, LLM_TEMPERATURE
-from app.utils.db_utils import get_static_list_of_industries, save_resume_data
-from app.utils.embeddings import df_with_embedding_column, embed_texts
+from exceptions import ResumeParsingError, ResumeNotFoundError, StructuredOutputParsingError, ResumeProcessingError
+from database.manager import DatabaseManager
+from models.profiles import ProfessionalProfile
+from config import api_key, LLM_MODEL_NAME, LLM_PROVIDER, LLM_TEMPERATURE
+from utils.db_utils import get_static_list_of_industries, save_resume_data
+from utils.embeddings import df_with_embedding_column, embed_texts
 from datetime import datetime
 
 
-def parse_resume(file: UploadFile):
+async def parse_resume(file: UploadFile):
     try:
-        file_bytes = file.read()
+        file_bytes = await file.read()
         doc = pymupdf.open(stream=file_bytes, filetype="pdf")
         cv_md_text = pymupdf4llm.to_markdown(doc)
     except Exception as e:
@@ -62,8 +62,8 @@ def get_resume_obj(resume_id: str) -> dict:
         db.close_all()
     return resume_obj
 
-def process_resume_upload(client: genai.Client, db: DatabaseManager, file: UploadFile):
-    cv_md_text = parse_resume(file)
+async def process_resume_upload(client: genai.Client, db: DatabaseManager, file: UploadFile):
+    cv_md_text = await parse_resume(file)
     profile_obj = extract_professional_structured_data(cv_md_text)
     position_embedding = embed_texts(client, [profile_obj["position"]["name"]])[0]
 
@@ -97,13 +97,15 @@ def process_resume_upload(client: genai.Client, db: DatabaseManager, file: Uploa
     soft_skills_df = soft_skills_df[["resume_id", "description", "weight", "embedding"]]
 
     try:
-        save_resume_data(
-            conn=db.connection,
-            cv_df=cv_df,
-            hard_skills_df=hard_skills_df,
-            soft_skills_df=soft_skills_df
-        )
+        with db.get_conn() as conn:
+            save_resume_data(
+                conn=conn,
+                cv_df=cv_df,
+                hard_skills_df=hard_skills_df,
+                soft_skills_df=soft_skills_df
+            )
     except Exception as e:
+        print(f"DB save error: {type(e).__name__}: {e}")
         raise ResumeProcessingError(detail="Failed to save resume data to database")
 
     

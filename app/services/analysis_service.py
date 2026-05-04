@@ -1,11 +1,11 @@
 import numpy as np
 import pandas as pd
 from sklearn.cluster import DBSCAN
-from ..database.manager import DatabaseManager
-from ..utils.matrix import (
+from database.manager import DatabaseManager
+from utils.matrix import (
     cosine_similarities_matrix, create_match_score_matrix, build_embedding_matrix, build_padded_matrix
 )
-from ..config import (
+from config import (
     SOFT_SKILLS_TABLE, HARD_SKILLS_TABLE, SOFT_SKILLS_SIMILARITY_THRESHOLD, 
     HARD_SKILLS_SIMILARITY_THRESHOLD, LLM_MODEL_VECTOR_DIMENSIONS, SOFT_SKILLS_STRING_COLUMN_INDEX,
     SOFT_SKILLS_WEIGHT_COLUMN_INDEX, HARD_SKILLS_STRING_COLUMN_INDEX,HARD_SKILLS_WEIGHT_COLUMN_INDEX

@@ -2,7 +2,7 @@
 from pydantic import BaseModel
 from typing import List, Optional
 from pydantic import BaseModel, Field
-from ..config import SENIORITY_LEVELS
+from config import SENIORITY_LEVELS
 
 
 class HardSkill(BaseModel):

@@ -1,7 +1,7 @@
-from ..services.resume_service import *
-from ..dependencies import get_db, get_genai_client
 from fastapi import Depends, status, HTTPException, APIRouter, UploadFile
-from app.exceptions import ResumeParsingError, StructuredOutputParsingError, EmbeddingError, ResumeNotFoundError
+from services.resume_service import *
+from dependencies import get_db, get_genai_client
+from exceptions import ResumeParsingError, StructuredOutputParsingError, EmbeddingError, ResumeNotFoundError
 
 router = APIRouter()
 
@@ -13,7 +13,7 @@ async def send_resume(
     client: genai.Client = Depends(get_genai_client),
 ):
     try:
-        upload_result = process_resume_upload(client, db, file)
+        upload_result = await process_resume_upload(client, db, file)
     except ResumeParsingError as e:
         raise HTTPException(status_code=400, detail=e.detail)
     except StructuredOutputParsingError as e:
