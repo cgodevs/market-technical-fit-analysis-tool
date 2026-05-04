@@ -1,10 +1,8 @@
-import pymupdf
-
-from ..utils.utils import *
-from fastapi import UploadFile, status, HTTPException, APIRouter
-from random import randint
+from ..services.resume_service import *
+from ..utils.embeddings import embed_texts
+from fastapi import status, HTTPException, APIRouter, UploadFile
 from datetime import datetime
-import pymupdf4llm
+from random import randint
 import uuid
 
 router = APIRouter()
@@ -16,11 +14,10 @@ async def send_resume(file: UploadFile):
     login_example = f"person{randint(0, 9999)}@mail.com"
     resume_upload_id = str(uuid.uuid4())
 
-    client = genai.Client(api_key=api_key)
-
-    file_bytes = await file.read()
-    doc = pymupdf.open(stream=file_bytes, filetype="pdf")
-    cv_md_text = pymupdf4llm.to_markdown(doc)
+    cv_md_text = await parse_resume(file)
+    if not cv_md_text:
+        raise HTTPException(status_code=500, detail="Failed to parse resume") 
+    
     profile_obj = extract_professional_structured_data(cv_md_text)
     upload_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -33,25 +30,10 @@ async def send_resume(file: UploadFile):
         "industries": profile_obj["industries"],
         "position": profile_obj["position"]["name"],
         "time_experience_months": profile_obj["position"]["time_experience_months"],
-        "position_embedding": embed_texts(client, [profile_obj["position"]["name"]])[0]
+        "position_embedding": embed_texts([profile_obj["position"]["name"]])[0]
     }
-
-    cv_df = pd.DataFrame([cv_obj])
-    hard_skills_df = pd.DataFrame(profile_obj["hard_skills"])
-    soft_skills_df = pd.DataFrame(profile_obj["soft_skills"])
-
-    hard_skills_df = recreate_df_with_embeddings(client, hard_skills_df, "description")
-    soft_skills_df = recreate_df_with_embeddings(client, soft_skills_df, "description")
-
-    hard_skills_df["resume_id"] = resume_upload_id
-    soft_skills_df["resume_id"] = resume_upload_id
-
-    hard_skills_df = hard_skills_df[["resume_id", "description", "weight", "time_experience_months", "embedding"]]
-    soft_skills_df = soft_skills_df[["resume_id", "description", "weight", "embedding"]]
-
-    save_df_to_database(df=cv_df, table_name=RESUMES_TABLE)
-    save_df_to_database(df=hard_skills_df, table_name=CANDIDATE_HARD_SKILLS_TABLE)
-    save_df_to_database(df=soft_skills_df, table_name=CANDIDATE_SOFT_SKILLS_TABLE)
+    save_resume_to_database(cv_obj)
+    save_skills_to_database(profile_obj, resume_upload_id)
 
     return {
         "message": "SUCCESS",
@@ -69,16 +51,8 @@ async def send_resume(file: UploadFile):
 
 @router.get("/resumes/{resume_id}", status_code=status.HTTP_200_OK)
 async def get_resume(resume_id: str):
-    db = DatabaseManager()
-    try:
-        resume_df = db.get_resume(resume_id).drop(columns=["position_embedding"])
-    except Exception as e:
-        raise HTTPException(status_code=500, detail="Failed to fetch resume") from e
-    finally:
-        db.close_all()
-
-    resume_obj = resume_df.to_dict(orient="records")[0] if not resume_df.empty else {}
-    if resume_obj == {}:
+    resume_obj = get_resume_obj(resume_id)
+    if not resume_obj:
         raise HTTPException(status_code=404, detail=f"Resume with id {resume_id} not found")
-
     return resume_obj
+
