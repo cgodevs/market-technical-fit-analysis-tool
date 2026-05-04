@@ -1,3 +1,4 @@
+from app.exceptions import EmbeddingError
 from ..config import EMBED_BATCH_SIZE, EMBED_CONCURRENCY, EMBED_MAX_RETRIES, EMBEDDING_MODEL, api_key
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from multiprocessing.pool import ThreadPool
@@ -7,6 +8,7 @@ import pandas as pd
 import re
 
 def embed_texts(
+    client: genai.Client,
     texts: list[str],
     batch_size: int = EMBED_BATCH_SIZE,
     concurrency: int = EMBED_CONCURRENCY,
@@ -15,15 +17,13 @@ def embed_texts(
     try:
         batches = [texts[i : i + batch_size] for i in range(0, len(texts), batch_size)]
         results: list[list[list[float]]] = [None] * len(batches)  # type: ignore[list-item]
-        client = genai.Client(api_key=api_key)
         with ThreadPoolExecutor(max_workers=concurrency) as pool:
             futures = {pool.submit(_embed_batch_with_retry, client, b): i for i, b in enumerate(batches)}
             for future in as_completed(futures):
                 results[futures[future]] = future.result()
         data = [emb for batch in results for emb in batch]
     except Exception as e:
-        print(e)
-        data = []
+        raise EmbeddingError(detail=str(e))
     return data
 
 def _embed_batch_with_retry(
@@ -46,7 +46,7 @@ def _embed_batch_with_retry(
             sleep(wait)
     raise RuntimeError("Max retries exceeded")
 
-def recreate_df_with_embeddings(client: genai.Client, df: pd.DataFrame, column_to_embed: str, batch_size: int = 100, concurrency: int = 5) -> pd.DataFrame:
+def df_with_embedding_column(client: genai.Client, df: pd.DataFrame, column_to_embed: str, batch_size: int = 100, concurrency: int = 5) -> pd.DataFrame:
     result_df = df.copy()
     skills = result_df[column_to_embed].tolist()
     batches = [skills[i:i + batch_size] for i in range(0, len(skills), batch_size)]
