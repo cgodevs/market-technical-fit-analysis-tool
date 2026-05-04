@@ -14,36 +14,42 @@ from ..utils.embeddings import recreate_df_with_embeddings
 import pandas as pd
 
 
-async def parse_resume(file: UploadFile):
+def parse_resume(file: UploadFile):
     try:
-        file_bytes = await file.read()
+        file_bytes = file.read()
         doc = pymupdf.open(stream=file_bytes, filetype="pdf")
         cv_md_text = pymupdf4llm.to_markdown(doc)
-    except Exception:
-        cv_md_text = ""
+    except Exception as e:
+        print(e)
+        cv_md_text = None
     return cv_md_text
 
 def extract_professional_structured_data(text: str) -> dict:
-    llm = init_chat_model(
-        model=LLM_MODEL_NAME,
-        model_provider=LLM_PROVIDER,
-        temperature=LLM_TEMPERATURE,
-        api_key=api_key
-    )
-    system_prompt = f"""
-        Your role is to extract data out of a resume text provided to build it a metadata object. 
-        Use all sets of experiences identified to build a complete object.
-        Work industries list to choose from for the main goal position: {'|'.join(get_static_list_of_industries())}
-    """
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", system_prompt),
-        ("human", "{input}")
-    ])
+    try:
+        llm = init_chat_model(
+            model=LLM_MODEL_NAME,
+            model_provider=LLM_PROVIDER,
+            temperature=LLM_TEMPERATURE,
+            api_key=api_key
+        )
+        system_prompt = f"""
+            Your role is to extract data out of a resume text provided to build it a metadata object. 
+            Use all sets of experiences identified to build a complete object.
+            Work industries list to choose from for the main goal position: {'|'.join(get_static_list_of_industries())}
+        """
+        prompt = ChatPromptTemplate.from_messages([
+            ("system", system_prompt),
+            ("human", "{input}")
+        ])
 
-    structured_llm = llm.with_structured_output(schema=ProfessionalProfile)
-    chain = prompt | structured_llm
-    response = chain.invoke({"input": text})
-    return response.model_dump()
+        structured_llm = llm.with_structured_output(schema=ProfessionalProfile)
+        chain = prompt | structured_llm
+        response = chain.invoke({"input": text})
+        data= response.model_dump()
+    except Exception as e:
+        print(e)
+        data = {}
+    return data
 
 def get_resume_obj(resume_id: str) -> dict:
     db = DatabaseManager()
@@ -51,6 +57,7 @@ def get_resume_obj(resume_id: str) -> dict:
         resume_df = db.get_resume(resume_id).drop(columns=["position_embedding"])
         resume_obj = resume_df.to_dict(orient="records")[0] if not resume_df.empty else {}
     except Exception as e:
+        print(e)
         resume_obj = {}
     finally:
         db.close_all()

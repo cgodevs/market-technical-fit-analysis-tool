@@ -12,16 +12,19 @@ def embed_texts(
     concurrency: int = EMBED_CONCURRENCY,
 ) -> list[list[float]]:
     """Embed an arbitrary list of texts in parallel batches."""
-    batches = [texts[i : i + batch_size] for i in range(0, len(texts), batch_size)]
-    results: list[list[list[float]]] = [None] * len(batches)  # type: ignore[list-item]
-    client = genai.Client(api_key=api_key)
-
-    with ThreadPoolExecutor(max_workers=concurrency) as pool:
-        futures = {pool.submit(_embed_batch_with_retry, client, b): i for i, b in enumerate(batches)}
-        for future in as_completed(futures):
-            results[futures[future]] = future.result()
-
-    return [emb for batch in results for emb in batch]
+    try:
+        batches = [texts[i : i + batch_size] for i in range(0, len(texts), batch_size)]
+        results: list[list[list[float]]] = [None] * len(batches)  # type: ignore[list-item]
+        client = genai.Client(api_key=api_key)
+        with ThreadPoolExecutor(max_workers=concurrency) as pool:
+            futures = {pool.submit(_embed_batch_with_retry, client, b): i for i, b in enumerate(batches)}
+            for future in as_completed(futures):
+                results[futures[future]] = future.result()
+        data = [emb for batch in results for emb in batch]
+    except Exception as e:
+        print(e)
+        data = []
+    return data
 
 def _embed_batch_with_retry(
     client: genai.Client,

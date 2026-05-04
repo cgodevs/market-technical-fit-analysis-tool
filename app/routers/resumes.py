@@ -11,16 +11,21 @@ router = APIRouter()
 @router.post("/resumes/upload", status_code=status.HTTP_201_CREATED)
 async def send_resume(file: UploadFile):
 
-    login_example = f"person{randint(0, 9999)}@mail.com"
-    resume_upload_id = str(uuid.uuid4())
-
-    cv_md_text = await parse_resume(file)
+    cv_md_text = parse_resume(file)
     if not cv_md_text:
         raise HTTPException(status_code=500, detail="Failed to parse resume") 
     
     profile_obj = extract_professional_structured_data(cv_md_text)
+    if not profile_obj:
+        raise HTTPException(status_code=500, detail="Failed to extract structured data from resume")
+    
+    position_embedding = embed_texts([profile_obj["position"]["name"]])[0]
+    if not position_embedding:
+        raise HTTPException(status_code=500, detail="Failed to embed position")
+    
+    login_example = f"person{randint(0, 9999)}@mail.com"
+    resume_upload_id = str(uuid.uuid4())
     upload_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
     cv_obj = {
         "id": resume_upload_id,
         "user_id": login_example,
@@ -30,10 +35,11 @@ async def send_resume(file: UploadFile):
         "industries": profile_obj["industries"],
         "position": profile_obj["position"]["name"],
         "time_experience_months": profile_obj["position"]["time_experience_months"],
-        "position_embedding": embed_texts([profile_obj["position"]["name"]])[0]
+        "position_embedding": position_embedding
     }
+
     save_resume_to_database(cv_obj)
-    save_skills_to_database(profile_obj, resume_upload_id)
+    save_skills_to_database(profile_obj, resume_upload_id) # TODO: make this transactional to avoid saving skills without the resume in case of error
 
     return {
         "message": "SUCCESS",
@@ -50,7 +56,7 @@ async def send_resume(file: UploadFile):
 
 
 @router.get("/resumes/{resume_id}", status_code=status.HTTP_200_OK)
-async def get_resume(resume_id: str):
+async def get_resume_by_id(resume_id: str):
     resume_obj = get_resume_obj(resume_id)
     if not resume_obj:
         raise HTTPException(status_code=404, detail=f"Resume with id {resume_id} not found")
