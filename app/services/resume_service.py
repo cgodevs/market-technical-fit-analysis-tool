@@ -53,16 +53,11 @@ def extract_professional_structured_data(text: str) -> dict:
     return data
 
 def get_resume_obj(db: DatabaseManager, resume_id: str) -> ResumeResponse:
-    try:
-        resume_df = db.get_resume(resume_id).drop(columns=["position_embedding"])
-        if resume_df.empty:
-            raise ResumeNotFoundError(resume_id=resume_id)
-        row = resume_df.to_dict(orient="records")[0]
-        return ResumeResponse(**row)
-    except ResumeNotFoundError:
-        raise
-    except Exception:
+    resume_df = db.get_resume(resume_id).drop(columns=["position_embedding"])
+    if resume_df.empty:
         raise ResumeNotFoundError(resume_id=resume_id)
+    row = resume_df.to_dict(orient="records")[0]
+    return ResumeResponse(**row)
 
 async def process_resume_upload(client: genai.Client, db: DatabaseManager, file: UploadFile):
     cv_md_text = await parse_resume(file)

@@ -33,6 +33,6 @@ async def get_resume_by_id(
 ):
     try:
         return get_resume_obj(db, resume_id)
-    except ResumeNotFoundError(resume_id=resume_id) as e:
+    except ResumeNotFoundError as e:
         raise HTTPException(status_code=404, detail=e.detail)
 
