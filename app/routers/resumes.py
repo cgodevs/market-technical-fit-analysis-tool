@@ -1,6 +1,6 @@
 import pymupdf
 
-from .. utils import *
+from ..utils.utils import *
 from fastapi import UploadFile, status, HTTPException, APIRouter
 from random import randint
 from datetime import datetime
@@ -68,7 +68,7 @@ async def send_resume(file: UploadFile):
 
 
 @router.get("/resumes/{resume_id}", status_code=status.HTTP_200_OK)
-async def candidate_resume(resume_id: str):
+async def get_resume(resume_id: str):
     db = DatabaseManager()
     try:
         resume_df = db.get_resume(resume_id).drop(columns=["position_embedding"])
