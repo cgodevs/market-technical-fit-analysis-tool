@@ -1,5 +1,5 @@
 from exceptions import EmbeddingError
-from config import EMBED_BATCH_SIZE, EMBED_CONCURRENCY, EMBED_MAX_RETRIES, EMBEDDING_MODEL, api_key
+from config import EMBED_BATCH_SIZE, EMBED_CONCURRENCY, EMBED_MAX_RETRIES, EMBEDDING_MODEL
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from multiprocessing.pool import ThreadPool
 from time import sleep
@@ -47,6 +47,7 @@ def _embed_batch_with_retry(
     raise RuntimeError("Max retries exceeded")
 
 def df_with_embedding_column(client: genai.Client, df: pd.DataFrame, column_to_embed: str, batch_size: int = 100, concurrency: int = 5) -> pd.DataFrame:
+    """Return a copy of the DataFrame with an added 'embedding' column containing vector embeddings of the specified text column."""
     result_df = df.copy()
     skills = result_df[column_to_embed].tolist()
     batches = [skills[i:i + batch_size] for i in range(0, len(skills), batch_size)]

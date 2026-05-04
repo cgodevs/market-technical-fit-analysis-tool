@@ -4,13 +4,16 @@ from psycopg2.extras import execute_values
 from psycopg2.extensions import connection as PsycopgConnection
 import pandas as pd
 
-
-def get_static_list_of_industries() -> List[str]:
-    with open("../data/enum_industry.txt", "r") as f:
-        industries = [line.strip() for line in f if line.strip()]
-        industries = [industry.upper() for industry in industries]
-    return industries
-
+def _safe_scalar(value):
+    """Convert a single value to a safe type for database insertion."""
+    if hasattr(value, "item"):
+        value = value.item()
+    if isinstance(value, float) and value != value:
+        return 0
+    if isinstance(value, int) and not isinstance(value, bool):
+        if value < -32768 or value > 32767:
+            return 0
+    return value
 
 def _insert_df(conn: PsycopgConnection, df: pd.DataFrame, table_name: str) -> None:
     """Low-level insert — expects an already-open connection, no commit."""
@@ -29,6 +32,12 @@ def _insert_df(conn: PsycopgConnection, df: pd.DataFrame, table_name: str) -> No
         page_size=500
     )
 
+def get_static_list_of_industries() -> List[str]:
+    """Load a static list of industries from a text file."""
+    with open("../data/enum_industry.txt", "r") as f:
+        industries = [line.strip() for line in f if line.strip()]
+        industries = [industry.upper() for industry in industries]
+    return industries
 
 def save_resume_data(
     conn: PsycopgConnection,
@@ -48,14 +57,3 @@ def save_resume_data(
     except Exception:
         conn.rollback()
         raise
-
-
-def _safe_scalar(value):
-    if hasattr(value, "item"):
-        value = value.item()
-    if isinstance(value, float) and value != value:
-        return 0
-    if isinstance(value, int) and not isinstance(value, bool):
-        if value < -32768 or value > 32767:
-            return 0
-    return value

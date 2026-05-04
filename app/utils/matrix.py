@@ -1,3 +1,8 @@
+import pandas as pd
+import numpy as np
+from config import LLM_MODEL_VECTOR_DIMENSIONS
+
+
 def build_padded_matrix(
         df: pd.DataFrame,
         column_name: str,
