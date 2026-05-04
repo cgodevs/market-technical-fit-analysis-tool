@@ -10,6 +10,7 @@ from random import randint
 from exceptions import ResumeParsingError, ResumeNotFoundError, StructuredOutputParsingError, ResumeProcessingError
 from database.manager import DatabaseManager
 from models.profiles import ProfessionalProfile
+from models.responses import UploadResponse, ResumeResponse
 from config import api_key, LLM_MODEL_NAME, LLM_PROVIDER, LLM_TEMPERATURE
 from utils.db_utils import get_static_list_of_industries, save_resume_data
 from utils.embeddings import df_with_embedding_column, embed_texts
@@ -51,16 +52,17 @@ def extract_professional_structured_data(text: str) -> dict:
         raise StructuredOutputParsingError(detail=str(e))
     return data
 
-def get_resume_obj(resume_id: str) -> dict:
-    db = DatabaseManager()
+def get_resume_obj(db: DatabaseManager, resume_id: str) -> ResumeResponse:
     try:
         resume_df = db.get_resume(resume_id).drop(columns=["position_embedding"])
-        resume_obj = resume_df.to_dict(orient="records")[0] if not resume_df.empty else {}
-    except Exception as e:
-        raise ResumeNotFoundError(detail=str(e))
-    finally:
-        db.close_all()
-    return resume_obj
+        if resume_df.empty:
+            raise ResumeNotFoundError(resume_id=resume_id)
+        row = resume_df.to_dict(orient="records")[0]
+        return ResumeResponse(**row)
+    except ResumeNotFoundError:
+        raise
+    except Exception:
+        raise ResumeNotFoundError(resume_id=resume_id)
 
 async def process_resume_upload(client: genai.Client, db: DatabaseManager, file: UploadFile):
     cv_md_text = await parse_resume(file)
@@ -109,9 +111,14 @@ async def process_resume_upload(client: genai.Client, db: DatabaseManager, file:
         raise ResumeProcessingError(detail="Failed to save resume data to database")
 
     
-    return {
-        "resume_upload_id": resume_upload_id,
-        "login_example": login_example,
-        "upload_date": upload_date,
-        "profile_obj": profile_obj
-    }
+    return UploadResponse(
+        upload_id=resume_upload_id,
+        resume_id=resume_upload_id,
+        user_id=login_example,
+        upload_date=upload_date,
+        position=profile_obj["position"]["name"],
+        industries=profile_obj["industries"],
+        time_experience_months=profile_obj["position"]["time_experience_months"],
+        hard_skills=profile_obj["hard_skills"],
+        soft_skills=profile_obj["soft_skills"]
+    )
