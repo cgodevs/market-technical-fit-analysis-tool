@@ -17,6 +17,11 @@ from config import (
     CANDIDATE_HARD_SKILLS_TABLE, CANDIDATE_SOFT_SKILLS_TABLE
 )
 
+_cache = TTLCache(maxsize=64, ttl=300)  # 5 minutes
+_lock = Lock()
+_market_cache = TTLCache(maxsize=32, ttl=600)  # 10 minutes
+_market_lock = Lock()
+
 
 class MarketSkillsMatrix:
     def __init__(self, database_manager: DatabaseManager, skill_type: str, candidate_industries: list):
@@ -114,12 +119,6 @@ class MarketSkillsMatrix:
             reverse=True,
         )
         return ranked if with_scores else [desc for desc, _ in ranked]
-
-
-_cache = TTLCache(maxsize=64, ttl=300)  # 5 minutes
-_lock = Lock()
-_market_cache = TTLCache(maxsize=32, ttl=600)  # 10 minutes
-_market_lock = Lock()
 
 
 @cached(_cache, lock=_lock)
