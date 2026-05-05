@@ -32,3 +32,17 @@ class SkillClusterSchema(BaseModel):
 class SkillsCoverageResponse(BaseModel):
     soft_skills: list[SkillClusterSchema]
     hard_skills: list[SkillClusterSchema]
+
+
+class AnalysisDisplayResponse(BaseModel):
+    job_id: str
+    job_index: int
+    required_skills: int
+    matched_count: int
+    minimum_compliance_pct: float
+    matched_skills: list[str]
+    insufficient_count: int
+    ideal_compliance_pct: float
+    insufficient_proficiency: list[str]
+    nonmatched_count: int
+    nonmatched_skills: list[str]

@@ -4,7 +4,7 @@ from sklearn.cluster import DBSCAN
 from exceptions import ResumeNotFoundError, ResumeProcessingError, DatabaseConnectionError, DatabaseQueryError
 from database.manager import DatabaseManager
 from psycopg2 import OperationalError, Error
-from models.responses import SkillClusterSchema, SkillsCoverageResponse
+from models.responses import SkillClusterSchema, SkillsCoverageResponse, AnalysisDisplayResponse
 from utils.matrix import (
     cosine_similarities_matrix, create_match_score_matrix, build_embedding_matrix, build_padded_matrix
 )
@@ -301,11 +301,21 @@ def get_noncompliant_skills_coverage(db: DatabaseManager, resume_id: str) -> Ski
         hard_skills=[SkillClusterSchema(**row) for row in noncompliant_hard_skills_report.to_dict(orient="records")]
     )
 
-def build_analysis_display(market_obj: MarketSkillsMatrix, analysis: list[dict]) -> pd.DataFrame:
+def build_analysis_display(db: DatabaseManager, resume_id: str, skill_type: str) -> list[AnalysisDisplayResponse]:
+    hard_market, soft_market = _analyze_market_for_coverage(db, resume_id)
+    if skill_type == "soft":
+        market_obj = soft_market
+        analysis = _get_market_analysis_results(market_obj)
+    elif skill_type == "hard":
+        market_obj = hard_market
+        analysis = _get_market_analysis_results(market_obj)
+    else:
+        raise ValueError(f"Invalid skill_type '{skill_type}', expected 'hard' or 'soft'")
+
     sorted_analysis = sorted(analysis, key=lambda e: e["minimum_compliance_pct"], reverse=True)
     sorted_counts = [market_obj.skills_count_by_index[market_obj.job_id_by_index.index(e["job_id"])] for e in sorted_analysis]
 
-    df = pd.DataFrame([
+    rows = [
         {
             "job_id": entry["job_id"],
             "job_index": entry["job_index"],
@@ -322,5 +332,5 @@ def build_analysis_display(market_obj: MarketSkillsMatrix, analysis: list[dict])
             "nonmatched_skills": entry["nonmatched_skills"],
         }
         for entry, count in zip(sorted_analysis, sorted_counts)
-    ])
-    return df
+    ]
+    return [AnalysisDisplayResponse(**row) for row in rows]
