@@ -21,3 +21,14 @@ class ResumeResponse(BaseModel):
     industries: list[str]
     position: str
     time_experience_months: int
+
+
+class SkillClusterSchema(BaseModel):
+    skill_variants: list[str]
+    total_matches: int
+    unique_jobs: int
+    job_coverage_pct: float
+
+class SkillsCoverageResponse(BaseModel):
+    soft_skills: list[SkillClusterSchema]
+    hard_skills: list[SkillClusterSchema]

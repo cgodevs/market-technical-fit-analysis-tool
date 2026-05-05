@@ -27,3 +27,13 @@ class EmbeddingError(Exception):
     def __init__(self, detail: str = "Failed to embed text"):
         self.detail = detail
         super().__init__(detail)
+
+class DatabaseConnectionError(Exception):
+    def __init__(self, detail: str):
+        self.detail = detail
+        super().__init__(detail)
+
+class DatabaseQueryError(Exception):
+    def __init__(self, detail: str):
+        self.detail = detail
+        super().__init__(detail)
