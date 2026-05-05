@@ -1,7 +1,7 @@
 from fastapi import Depends, status, HTTPException, APIRouter, UploadFile
-from services.resume_service import *
-from dependencies import get_db, get_genai_client
-from exceptions import ResumeParsingError, StructuredOutputParsingError, EmbeddingError, ResumeNotFoundError
+from api.app.services.resume_service import *
+from api.app.dependencies import get_db, get_genai_client
+from api.app.exceptions import ResumeParsingError, StructuredOutputParsingError, EmbeddingError, ResumeNotFoundError
 
 router = APIRouter()
 

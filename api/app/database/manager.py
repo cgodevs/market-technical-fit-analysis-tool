@@ -1,5 +1,5 @@
 import pandas as pd
-from config import *
+from api.app.config import *
 from contextlib import contextmanager
 from pgvector.psycopg2 import register_vector
 from psycopg2 import pool

@@ -1,6 +1,6 @@
 from google import genai
-from database.manager import DatabaseManager
-from config import api_key
+from api.app.database.manager import DatabaseManager
+from api.app.config import api_key
 
 def get_db():
     db = DatabaseManager()

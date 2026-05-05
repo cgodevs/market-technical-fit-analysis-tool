@@ -1,5 +1,6 @@
 from fastapi import FastAPI
-from routers import resumes, analysis
+from api.app.routers import resumes
+from api.app.routers import analysis
 
 app = FastAPI()
 app.include_router(resumes.router)

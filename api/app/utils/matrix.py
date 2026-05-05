@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from config import LLM_MODEL_VECTOR_DIMENSIONS
+from api.app.config import LLM_MODEL_VECTOR_DIMENSIONS
 
 
 def build_padded_matrix(
