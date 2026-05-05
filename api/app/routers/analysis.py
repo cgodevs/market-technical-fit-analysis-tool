@@ -1,9 +1,9 @@
 from fastapi import Depends, status, HTTPException, APIRouter
-from api.app.exceptions import EmbeddingError, ResumeProcessingError, ResumeNotFoundError, DatabaseQueryError, DatabaseConnectionError
-from api.app.database.manager import DatabaseManager
-from api.app.services.analysis_service import _cached_analysis, get_compliant_skills_coverage, get_noncompliant_skills_coverage, build_analysis_display
-from api.app.dependencies import get_db
-from api.app.models.responses import SkillsCoverageResponse, PaginatedAnalysisDisplayResponse
+from exceptions import EmbeddingError, ResumeProcessingError, ResumeNotFoundError, DatabaseQueryError, DatabaseConnectionError
+from database.manager import DatabaseManager
+from services.analysis_service import _cached_analysis, get_compliant_skills_coverage, get_noncompliant_skills_coverage, build_analysis_display
+from dependencies import get_db
+from models.responses import SkillsCoverageResponse, PaginatedAnalysisDisplayResponse
 from math import ceil
 
 router = APIRouter()

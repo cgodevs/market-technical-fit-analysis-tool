@@ -3,14 +3,14 @@ import pandas as pd
 from threading import Lock
 from cachetools import TTLCache, cached
 from sklearn.cluster import DBSCAN
-from api.app.exceptions import ResumeNotFoundError, ResumeProcessingError, DatabaseConnectionError, DatabaseQueryError
-from api.app.database.manager import DatabaseManager
+from exceptions import ResumeNotFoundError, ResumeProcessingError, DatabaseConnectionError, DatabaseQueryError
+from database.manager import DatabaseManager
 from psycopg2 import OperationalError, Error
-from api.app.models.responses import SkillClusterSchema, SkillsCoverageResponse, AnalysisDisplayResponse
-from api.app.utils.matrix import (
+from models.responses import SkillClusterSchema, SkillsCoverageResponse, AnalysisDisplayResponse
+from utils.matrix import (
     cosine_similarities_matrix, create_match_score_matrix, build_embedding_matrix, build_padded_matrix
 )
-from api.app.config import (
+from config import (
     SOFT_SKILLS_TABLE, HARD_SKILLS_TABLE, SOFT_SKILLS_SIMILARITY_THRESHOLD, 
     HARD_SKILLS_SIMILARITY_THRESHOLD, LLM_MODEL_VECTOR_DIMENSIONS, SOFT_SKILLS_STRING_COLUMN_INDEX,
     SOFT_SKILLS_WEIGHT_COLUMN_INDEX, HARD_SKILLS_STRING_COLUMN_INDEX,HARD_SKILLS_WEIGHT_COLUMN_INDEX,

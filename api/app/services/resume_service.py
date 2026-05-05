@@ -7,13 +7,13 @@ from fastapi import UploadFile
 from langchain_core.prompts import ChatPromptTemplate
 from google import genai
 from random import randint
-from api.app.exceptions import ResumeParsingError, ResumeNotFoundError, StructuredOutputParsingError, ResumeProcessingError
-from api.app.database.manager import DatabaseManager
-from api.app.models.profiles import ProfessionalProfile
-from api.app.models.responses import UploadResponse, ResumeResponse
-from api.app.config import api_key, LLM_MODEL_NAME, LLM_PROVIDER, LLM_TEMPERATURE
-from api.app.utils.db_utils import get_static_list_of_industries, save_resume_data
-from api.app.utils.embeddings import df_with_embedding_column, embed_texts
+from exceptions import ResumeParsingError, ResumeNotFoundError, StructuredOutputParsingError, ResumeProcessingError
+from database.manager import DatabaseManager
+from models.profiles import ProfessionalProfile
+from models.responses import UploadResponse, ResumeResponse
+from config import api_key, LLM_MODEL_NAME, LLM_PROVIDER, LLM_TEMPERATURE
+from utils.db_utils import get_static_list_of_industries, save_resume_data
+from utils.embeddings import df_with_embedding_column, embed_texts
 from datetime import datetime
 
 

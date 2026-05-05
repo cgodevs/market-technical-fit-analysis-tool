@@ -1,5 +1,5 @@
 from typing import List
-from api.app.config import RESUMES_TABLE, CANDIDATE_HARD_SKILLS_TABLE, CANDIDATE_SOFT_SKILLS_TABLE
+from config import RESUMES_TABLE, CANDIDATE_HARD_SKILLS_TABLE, CANDIDATE_SOFT_SKILLS_TABLE
 from psycopg2.extras import execute_values
 from psycopg2.extensions import connection as PsycopgConnection
 import pandas as pd

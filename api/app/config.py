@@ -24,7 +24,7 @@ EMBED_CONCURRENCY = 5
 EMBED_MAX_RETRIES = 3
 
 DB_NAME = "market_fit"
-DB_HOST = "localhost"
+DB_HOST = "host.docker.internal"
 db_user = getenv("DB_USER")
 db_pw = getenv("DB_PASSWORD")
 api_key = getenv('GEMINI_API_KEY')

@@ -1,0 +1,23 @@
+# Web Framework
+fastapi[standard]
+uvicorn
+
+# Data Science & Processing
+pandas
+numpy
+scikit-learn
+
+# AI & LLM Integration
+google-genai
+langchain
+langchain-core
+pymupdf
+pymupdf4llm
+
+# Database & Vector Search
+psycopg2-binary
+pgvector
+
+# Validation & Utilities
+pydantic
+cachetools
