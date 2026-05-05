@@ -118,6 +118,9 @@ class MarketSkillsMatrix:
 
 _cache = TTLCache(maxsize=64, ttl=300)  # 5 minutes
 _lock = Lock()
+_market_cache = TTLCache(maxsize=32, ttl=600)  # 10 minutes
+_market_lock = Lock()
+
 
 @cached(_cache, lock=_lock)
 def _cached_analysis(resume_id: str, skill_type: str) -> list[AnalysisDisplayResponse]:
@@ -126,6 +129,52 @@ def _cached_analysis(resume_id: str, skill_type: str) -> list[AnalysisDisplayRes
         return build_analysis_display(db, resume_id, skill_type)
     finally:
         db.close_all()
+
+@cached(_market_cache, key=lambda db, resume_id: resume_id, lock=_market_lock)
+def _analyze_market_for_coverage(db: DatabaseManager, resume_id: str) -> tuple[MarketSkillsMatrix, MarketSkillsMatrix]:
+    try:
+        resume_df = db.get_resume(resume_id)
+    except OperationalError as e:
+        raise DatabaseConnectionError(detail="Could not connect to database") from e
+    except Error as e:
+        raise DatabaseQueryError(detail="Failed to fetch resume") from e
+
+    if resume_df.empty:
+        raise ResumeNotFoundError(resume_id=resume_id)
+
+    try:
+        candidate_industries = resume_df["industries"][0]
+    except (KeyError, IndexError) as e:
+        raise ResumeProcessingError(detail="Resume is missing 'industries' field") from e
+
+    try:
+        candidate_hard_skills_df = db.get_candidate_skills(resume_id, CANDIDATE_HARD_SKILLS_TABLE)
+        candidate_soft_skills_df = db.get_candidate_skills(resume_id, CANDIDATE_SOFT_SKILLS_TABLE)
+    except OperationalError as e:
+        raise DatabaseConnectionError(detail="Could not connect to database") from e
+    except Error as e:
+        raise DatabaseQueryError(detail="Failed to fetch candidate skills") from e
+
+    if candidate_hard_skills_df.empty or candidate_soft_skills_df.empty:
+        raise ResumeProcessingError(detail=f"No skills found for resume {resume_id}")
+
+    try:
+        soft_market = MarketSkillsMatrix(database_manager=db, skill_type="soft", candidate_industries=candidate_industries)
+        hard_market = MarketSkillsMatrix(database_manager=db, skill_type="hard", candidate_industries=candidate_industries)
+    except Error as e:
+        raise DatabaseQueryError(detail="Failed to fetch market skills data") from e
+    except ValueError as e:
+        raise ResumeProcessingError(detail=str(e)) from e
+
+    try:
+        _analyze_market(soft_market, candidate_soft_skills_df, "soft")
+        _analyze_market(hard_market, candidate_hard_skills_df, "hard")
+    except ValueError as e:
+        raise ResumeProcessingError(detail=f"Market analysis failed: {str(e)}") from e
+    except Exception as e:
+        raise ResumeProcessingError(detail="Unexpected error during market analysis") from e
+
+    return hard_market, soft_market
 
 def _analyze_market(market_obj: MarketSkillsMatrix, candidate_skills_df: pd.DataFrame, skills_type: str) -> None:
     weight_column_index = SOFT_SKILLS_WEIGHT_COLUMN_INDEX if skills_type == "soft" else HARD_SKILLS_WEIGHT_COLUMN_INDEX
@@ -247,58 +296,12 @@ def _nonmatches_display(market_obj: MarketSkillsMatrix) -> pd.DataFrame:
     )
     return df[df["skill_variants"].apply(len) < 10] # Avoids poorly formed skill variants where a large number of non related items are grouped together
 
-def _analyze_market_for_coverage(db: DatabaseManager, resume_id: str) -> tuple[MarketSkillsMatrix, MarketSkillsMatrix]:
-    try:
-        resume_df = db.get_resume(resume_id)
-    except OperationalError as e:
-        raise DatabaseConnectionError(detail="Could not connect to database") from e
-    except Error as e:
-        raise DatabaseQueryError(detail="Failed to fetch resume") from e
-
-    if resume_df.empty:
-        raise ResumeNotFoundError(resume_id=resume_id)
-
-    try:
-        candidate_industries = resume_df["industries"][0]
-    except (KeyError, IndexError) as e:
-        raise ResumeProcessingError(detail="Resume is missing 'industries' field") from e
-
-    try:
-        candidate_hard_skills_df = db.get_candidate_skills(resume_id, CANDIDATE_HARD_SKILLS_TABLE)
-        candidate_soft_skills_df = db.get_candidate_skills(resume_id, CANDIDATE_SOFT_SKILLS_TABLE)
-    except OperationalError as e:
-        raise DatabaseConnectionError(detail="Could not connect to database") from e
-    except Error as e:
-        raise DatabaseQueryError(detail="Failed to fetch candidate skills") from e
-
-    if candidate_hard_skills_df.empty or candidate_soft_skills_df.empty:
-        raise ResumeProcessingError(detail=f"No skills found for resume {resume_id}")
-
-    try:
-        soft_market = MarketSkillsMatrix(database_manager=db, skill_type="soft", candidate_industries=candidate_industries)
-        hard_market = MarketSkillsMatrix(database_manager=db, skill_type="hard", candidate_industries=candidate_industries)
-    except Error as e:
-        raise DatabaseQueryError(detail="Failed to fetch market skills data") from e
-    except ValueError as e:
-        raise ResumeProcessingError(detail=str(e)) from e
-
-    try:
-        _analyze_market(soft_market, candidate_soft_skills_df, "soft")
-        _analyze_market(hard_market, candidate_hard_skills_df, "hard")
-    except ValueError as e:
-        raise ResumeProcessingError(detail=f"Market analysis failed: {str(e)}") from e
-    except Exception as e:
-        raise ResumeProcessingError(detail="Unexpected error during market analysis") from e
-
-    return hard_market, soft_market
-
 def get_compliant_skills_coverage(db: DatabaseManager, resume_id: str) -> SkillsCoverageResponse:
     hard_market, soft_market = _analyze_market_for_coverage(db, resume_id)
     market_soft_skills_analysis = _get_market_analysis_results(soft_market)
     market_hard_skills_analysis = _get_market_analysis_results(hard_market)
     compliant_soft_skills_report = _matches_display(soft_market, market_soft_skills_analysis)    
     compliant_hard_skills_report = _matches_display(hard_market, market_hard_skills_analysis) 
-
     return SkillsCoverageResponse(
         soft_skills=[SkillClusterSchema(**row) for row in compliant_soft_skills_report.to_dict(orient="records")],
         hard_skills=[SkillClusterSchema(**row) for row in compliant_hard_skills_report.to_dict(orient="records")]
@@ -308,7 +311,6 @@ def get_noncompliant_skills_coverage(db: DatabaseManager, resume_id: str) -> Ski
     hard_market, soft_market = _analyze_market_for_coverage(db, resume_id)
     noncompliant_soft_skills_report = _nonmatches_display(soft_market)
     noncompliant_hard_skills_report = _nonmatches_display(hard_market)
-
     return SkillsCoverageResponse(
         soft_skills=[SkillClusterSchema(**row) for row in noncompliant_soft_skills_report.to_dict(orient="records")],
         hard_skills=[SkillClusterSchema(**row) for row in noncompliant_hard_skills_report.to_dict(orient="records")]
@@ -327,7 +329,6 @@ def build_analysis_display(db: DatabaseManager, resume_id: str, skill_type: str)
 
     sorted_analysis = sorted(analysis, key=lambda e: e["minimum_compliance_pct"], reverse=True)
     sorted_counts = [market_obj.skills_count_by_index[market_obj.job_id_by_index.index(e["job_id"])] for e in sorted_analysis]
-
     rows = [
         {
             "job_id": entry["job_id"],
