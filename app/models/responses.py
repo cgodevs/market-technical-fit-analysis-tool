@@ -46,3 +46,10 @@ class AnalysisDisplayResponse(BaseModel):
     insufficient_proficiency: list[str]
     nonmatched_count: int
     nonmatched_skills: list[str]
+
+class PaginatedAnalysisDisplayResponse(BaseModel):
+    total: int
+    page: int
+    page_size: int
+    total_pages: int
+    results: list[AnalysisDisplayResponse]

@@ -1,5 +1,7 @@
 import numpy as np
 import pandas as pd
+from threading import Lock
+from cachetools import TTLCache, cached
 from sklearn.cluster import DBSCAN
 from exceptions import ResumeNotFoundError, ResumeProcessingError, DatabaseConnectionError, DatabaseQueryError
 from database.manager import DatabaseManager
@@ -113,6 +115,17 @@ class MarketSkillsMatrix:
         )
         return ranked if with_scores else [desc for desc, _ in ranked]
 
+
+_cache = TTLCache(maxsize=64, ttl=300)  # 5 minutes
+_lock = Lock()
+
+@cached(_cache, lock=_lock)
+def _cached_analysis(resume_id: str, skill_type: str) -> list[AnalysisDisplayResponse]:
+    db = DatabaseManager()
+    try:
+        return build_analysis_display(db, resume_id, skill_type)
+    finally:
+        db.close_all()
 
 def _analyze_market(market_obj: MarketSkillsMatrix, candidate_skills_df: pd.DataFrame, skills_type: str) -> None:
     weight_column_index = SOFT_SKILLS_WEIGHT_COLUMN_INDEX if skills_type == "soft" else HARD_SKILLS_WEIGHT_COLUMN_INDEX
