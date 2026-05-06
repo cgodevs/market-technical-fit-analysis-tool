@@ -1,5 +1,3 @@
-# In case the industries table had no embeddings built yet, we build them and update the table before proceeding to fill in the ai_industries and ai_experience_time_months fields for the job postings
-
 import pandas as pd
 import psycopg2
 import time

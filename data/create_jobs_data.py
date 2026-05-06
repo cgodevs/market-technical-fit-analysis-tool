@@ -1,31 +1,17 @@
-"""
-ETL pipeline: LinkedIn API → enriched job postings → PostgreSQL.
-
-Stages:
-  1. Load      – read raw JSON
-  2. Filter    – select columns, deduplicate
-  3. Transform – rename, normalize, add metadata columns
-  4. Enrich    – embed job titles → top industries; LLM seniority extraction
-  5. Save      – bulk-insert into PostgreSQL
-"""
-
-from __future__ import annotations
-
 import json
 import re
 import time
-from os import getenv
-from typing import Optional
-from concurrent.futures import ThreadPoolExecutor, as_completed
-
 import psycopg2
 import psycopg2.extras
 import numpy as np
 import pandas as pd
-from pydantic import BaseModel, Field
+from os import getenv
 from google import genai
+from typing import Optional
+from pydantic import BaseModel, Field
 from langchain.chat_models import init_chat_model
 from langchain_core.prompts import ChatPromptTemplate
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # ---------------------------------------------------------------------------
 # Configuration

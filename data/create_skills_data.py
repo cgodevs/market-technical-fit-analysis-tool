@@ -1,27 +1,14 @@
-"""
-Skills extraction pipeline: job_postings → hard_skills + soft_skills (with embeddings).
-
-Stages:
-  1. Load      – fetch job postings from PostgreSQL
-  2. Extract   – LLM extracts hard/soft skills per job (parallel)
-  3. Embed     – embed skill descriptions in parallel batches
-  4. Save      – bulk-insert both skill tables (parallel)
-"""
-
-from __future__ import annotations
-
 import re
 import time
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from os import getenv
-from typing import Optional
-
 import pandas as pd
 import psycopg2
 import psycopg2.extras
+from os import getenv
+from typing import Optional
 from google import genai
 from langchain.chat_models import init_chat_model
 from langchain_core.prompts import ChatPromptTemplate
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pgvector.psycopg2 import register_vector
 from pydantic import BaseModel, Field
 
