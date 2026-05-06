@@ -1,4 +1,5 @@
 import numpy as np
+import concurrent.futures
 import pandas as pd
 from threading import Lock
 from cachetools import TTLCache, cached
@@ -297,22 +298,41 @@ def _nonmatches_display(market_obj: MarketSkillsMatrix) -> pd.DataFrame:
 
 def get_compliant_skills_coverage(db: DatabaseManager, resume_id: str) -> SkillsCoverageResponse:
     hard_market, soft_market = _analyze_market_for_coverage(db, resume_id)
-    market_soft_skills_analysis = _get_market_analysis_results(soft_market)
-    market_hard_skills_analysis = _get_market_analysis_results(hard_market)
-    compliant_soft_skills_report = _matches_display(soft_market, market_soft_skills_analysis)    
-    compliant_hard_skills_report = _matches_display(hard_market, market_hard_skills_analysis) 
+
+    def process_skills(market_data):
+        analysis = _get_market_analysis_results(market_data)
+        report = _matches_display(market_data, analysis)
+        return [SkillClusterSchema(**row) for row in report.to_dict(orient="records")]
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+        soft_future = pool.submit(process_skills, soft_market)
+        hard_future = pool.submit(process_skills, hard_market)
+        compliant_soft_skills_report = soft_future.result()
+        compliant_hard_skills_report = hard_future.result()
+
     return SkillsCoverageResponse(
-        soft_skills=[SkillClusterSchema(**row) for row in compliant_soft_skills_report.to_dict(orient="records")],
-        hard_skills=[SkillClusterSchema(**row) for row in compliant_hard_skills_report.to_dict(orient="records")]
-    )
+            soft_skills=compliant_soft_skills_report,
+            hard_skills=compliant_hard_skills_report
+        )
+
+import concurrent.futures
 
 def get_noncompliant_skills_coverage(db: DatabaseManager, resume_id: str) -> SkillsCoverageResponse:
     hard_market, soft_market = _analyze_market_for_coverage(db, resume_id)
-    noncompliant_soft_skills_report = _nonmatches_display(soft_market)
-    noncompliant_hard_skills_report = _nonmatches_display(hard_market)
+
+    def process_noncompliant(market_data):
+        report = _nonmatches_display(market_data)
+        return [SkillClusterSchema(**row) for row in report.to_dict(orient="records")]
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+        soft_future = executor.submit(process_noncompliant, soft_market)
+        hard_future = executor.submit(process_noncompliant, hard_market)
+        soft_skills = soft_future.result()
+        hard_skills = hard_future.result()
+
     return SkillsCoverageResponse(
-        soft_skills=[SkillClusterSchema(**row) for row in noncompliant_soft_skills_report.to_dict(orient="records")],
-        hard_skills=[SkillClusterSchema(**row) for row in noncompliant_hard_skills_report.to_dict(orient="records")]
+        soft_skills=soft_skills,
+        hard_skills=hard_skills
     )
 
 def build_analysis_display(db: DatabaseManager, resume_id: str, skill_type: str) -> list[AnalysisDisplayResponse]:
