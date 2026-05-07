@@ -315,8 +315,6 @@ def get_compliant_skills_coverage(db: DatabaseManager, resume_id: str) -> Skills
             hard_skills=compliant_hard_skills_report
         )
 
-import concurrent.futures
-
 def get_noncompliant_skills_coverage(db: DatabaseManager, resume_id: str) -> SkillsCoverageResponse:
     hard_market, soft_market = _analyze_market_for_coverage(db, resume_id)
 
