@@ -2,8 +2,8 @@ from celery import Celery
 
 celery = Celery(
     "resume_worker",
-    broker="redis://localhost:6379/0",
-    backend="redis://localhost:6379/0",
+    broker="redis://redis:6379/0",
+    backend="redis://redis:6379/0",
 )
 
 celery.conf.update(
@@ -14,4 +14,4 @@ celery.conf.update(
 )
 
 # Autodiscover tasks from services module
-celery.autodiscover_tasks(['services'])
+celery.autodiscover_tasks(['app.services'])
