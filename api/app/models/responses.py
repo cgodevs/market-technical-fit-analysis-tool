@@ -53,3 +53,6 @@ class PaginatedAnalysisDisplayResponse(BaseModel):
     page_size: int
     total_pages: int
     results: list[AnalysisDisplayResponse]
+
+class AcceptedResponse(BaseModel):
+    upload_id: str

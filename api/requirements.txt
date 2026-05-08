@@ -6,6 +6,7 @@ uvicorn
 pandas
 numpy
 scikit-learn
+celery
 
 # AI & LLM Integration
 google-genai
@@ -17,6 +18,7 @@ pymupdf4llm
 # Database & Vector Search
 psycopg2-binary
 pgvector
+redis
 
 # Validation & Utilities
 pydantic

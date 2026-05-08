@@ -1,85 +1,15 @@
-import uuid
 import json
-import pymupdf
-import pymupdf4llm
 import pandas as pd
-from google import genai
 from random import randint
 from datetime import datetime
-from fastapi import UploadFile
-from langchain.chat_models import init_chat_model
-from langchain_core.prompts import ChatPromptTemplate
-from exceptions import ResumeParsingError, ResumeNotFoundError, StructuredOutputParsingError
+
 from celery_app import celery
+from google import genai
 from database.manager import DatabaseManager
-from models.profiles import ProfessionalProfile
-from models.responses import ResumeResponse, AcceptedResponse
-from config import api_key, LLM_MODEL_NAME, LLM_PROVIDER, LLM_TEMPERATURE
-from utils.db_utils import get_static_list_of_industries, save_resume_data
+from utils.db_utils import save_resume_data
 from utils.embeddings import df_with_embedding_column, embed_texts
-
-
-async def parse_resume(file: UploadFile):
-    try:
-        file_bytes = await file.read()
-        doc = pymupdf.open(stream=file_bytes, filetype="pdf")
-        cv_md_text = pymupdf4llm.to_markdown(doc)
-    except Exception as e:
-        raise ResumeParsingError(detail=str(e))
-    return cv_md_text
-
-def extract_professional_structured_data(text: str) -> dict:
-    try:
-        llm = init_chat_model(
-            model=LLM_MODEL_NAME,
-            model_provider=LLM_PROVIDER,
-            temperature=LLM_TEMPERATURE,
-            api_key=api_key
-        )
-        system_prompt = f"""
-            Your role is to extract data out of a resume text provided to build it a metadata object. 
-            Use all sets of experiences identified to build a complete object.
-            Work industries list to choose from for the main goal position: {'|'.join(get_static_list_of_industries())}
-        """
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", system_prompt),
-            ("human", "{input}")
-        ])
-
-        structured_llm = llm.with_structured_output(schema=ProfessionalProfile)
-        chain = prompt | structured_llm
-        response = chain.invoke({"input": text})
-        data= response.model_dump()
-    except Exception as e:
-        raise StructuredOutputParsingError(detail=str(e))
-    return data
-
-def get_resume_obj(db: DatabaseManager, resume_id: str) -> ResumeResponse:
-    resume_df = db.get_resume(resume_id).drop(columns=["position_embedding"])
-    if resume_df.empty:
-        raise ResumeNotFoundError(resume_id=resume_id)
-    row = resume_df.to_dict(orient="records")[0]
-    return ResumeResponse(**row)
-
-async def process_resume_upload(file: UploadFile) -> AcceptedResponse:
-    """
-    1. Parse the PDF to markdown (fast, ~seconds).
-    2. Generate an upload_id.
-    3. Enqueue the heavy work (LLM + embeddings + DB) to Celery.
-    4. Return 202 Accepted with the upload_id for polling.
-    """
-    cv_md_text = await parse_resume(file)
-    upload_id = str(uuid.uuid4())
-
-    process_resume_task.delay(upload_id, cv_md_text)
-
-    return AcceptedResponse(upload_id=upload_id)
-
-def get_upload_status(upload_id: str) -> dict:
-    status = get_status(upload_id)
-    if status is None:
-        raise ResumeNotFoundError(resume_id=upload_id)
-    return status
+from services.resume_service import extract_professional_structured_data
+from config import api_key
 
 
 def _get_redis():

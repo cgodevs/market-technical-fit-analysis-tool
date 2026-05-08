@@ -1,0 +1,40 @@
+services:
+
+  api:
+    build: .
+    ports:
+      - "8000:80"
+    volumes:
+      - .:/code
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+
+  redis-commander:
+      image: rediscommander/redis-commander
+      ports:
+          - "8081:8081"
+      environment:
+          - REDIS_HOSTS=local:redis:6379
+
+  worker:
+      build: .
+      command: celery -A app.celery_app worker --loglevel=info --concurrency=2
+      volumes:
+        - .:/code
+      environment:
+        - DB_USER=${DB_USER}
+        - DB_PASSWORD=${DB_PASSWORD}
+        - GEMINI_API_KEY=${GEMINI_API_KEY}
+      depends_on:
+        - redis
