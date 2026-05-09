@@ -1,4 +1,5 @@
-[Status Badge](https://img.shields.io/badge/STATUS-Developing-blue)
+![Status Badge](https://img.shields.io/badge/STATUS-Developing-blue)  
+
 ## :dart: Project Goal 
   
 This is a tool meant to scan the job market for a candidate resume and provide them with a Market Fit Analysis in quantity and quality. Helping them spot **how their main skills, techs and tools** currently relate to the market requirements, which can they improve and which are they currently most compliant with. 
