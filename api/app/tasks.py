@@ -2,20 +2,19 @@ import json
 import pandas as pd
 from random import randint
 from datetime import datetime
-
 from celery_app import celery
 from google import genai
 from database.manager import DatabaseManager
 from utils.db_utils import save_resume_data
 from utils.embeddings import df_with_embedding_column, embed_texts
-from services.resume_service import extract_professional_structured_data
+from services.llm_service import extract_professional_structured_data
 from config import api_key
 
 
 def _get_redis():
     """Return a plain redis client for status tracking."""
     import redis
-    return redis.Redis(host="localhost", port=6379, db=1, decode_responses=True)
+    return redis.Redis(host="redis", port=6379, db=1, decode_responses=True)
 
 
 def set_status(upload_id: str, status: str, detail: dict | None = None):

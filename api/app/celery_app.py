@@ -4,6 +4,7 @@ celery = Celery(
     "resume_worker",
     broker="redis://redis:6379/0",
     backend="redis://redis:6379/0",
+    include=["tasks"]
 )
 
 celery.conf.update(
@@ -12,6 +13,3 @@ celery.conf.update(
     accept_content=["json"],
     task_track_started=True,
 )
-
-# Autodiscover tasks from services module
-celery.autodiscover_tasks(['app.services'])

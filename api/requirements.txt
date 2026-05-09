@@ -12,6 +12,7 @@ celery
 google-genai
 langchain
 langchain-core
+langchain-google-genai
 pymupdf
 pymupdf4llm
 

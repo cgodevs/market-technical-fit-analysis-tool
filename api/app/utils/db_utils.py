@@ -34,7 +34,7 @@ def _insert_df(conn: PsycopgConnection, df: pd.DataFrame, table_name: str) -> No
 
 def get_static_list_of_industries() -> List[str]:
     """Load a static list of industries from a text file."""
-    with open("../data/enum_industry.txt", "r") as f:
+    with open("/data/enum_industry.txt", "r") as f:
         industries = [line.strip() for line in f if line.strip()]
         industries = [industry.upper() for industry in industries]
     return industries
